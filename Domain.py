@@ -1,19 +1,23 @@
 import subprocess
 import platform
+import re
+import os
 
 def compileCPlus():
-    compilationProcess = subprocess.Popen([r"/usr/bin/g++","test.cpp","-o","output.exe"],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    inputFile = "test.cpp"  #swap this out with the name of the file the user added
+    exeFile = re.sub(".cpp$",".exe",inputFile)  #replace .cpp with .exe
+    compilationProcess = subprocess.Popen([r"/usr/bin/g++",inputFile,"-o",exeFile],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     compilationProcess.communicate()
-    #error = compilationProcess.stderr.read()
 
     #return output
+
 
 def runCPlus(pairs,inputFile):
     compilationProcess = subprocess.Popen(["./output.exe"], stdout=subprocess.PIPE,stdin="test")
     output = compilationProcess.stdout.read()
 
 def removeFile(inputFile):
-    pass
+    os.remove(inputFile)
 
 def testFile(inputFile,testStrings):
     compileCPlus()
@@ -21,7 +25,7 @@ def testFile(inputFile,testStrings):
     removeFile()
     pass
 
-#compileCPlus()
+print (compileCPlus())
 
 print(platform.system())
 
@@ -30,3 +34,5 @@ compilationProcess = subprocess.Popen(["./output.exe"], stdout=subprocess.PIPE,s
 compilationProcess.communicate(input="test")
 output = compilationProcess.stdout.read()
 print(output)
+
+
