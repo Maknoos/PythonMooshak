@@ -29,10 +29,14 @@ print (compileCPlus())
 
 print(platform.system())
 
-compileCPlus()
-compilationProcess = subprocess.Popen(["./output.exe"], stdout=subprocess.PIPE,stdin=subprocess.PIPE)
-compilationProcess.communicate(input="test")
-output = compilationProcess.stdout.read()
-print(output)
+def maggi():
+    compileCPlus()
+    compilationProcess = subprocess.Popen(["./output.exe"], stdout=subprocess.PIPE,stdin=subprocess.PIPE)
+    dummystring = "test"
+    compilationProcess.communicate(input=dummystring.encode())
+    output = compilationProcess.stdout.read()
+    print(output)
+
+maggi()
 
 
