@@ -13,11 +13,13 @@ def compileCPlus():
 
 
 def runCPlus(pairs,inputFile):
+    runString = "./" + inputFile + ".exe"
     for pair in pairs:
-        compilationProcess = subprocess.Popen(["./test.exe"], stdout=subprocess.PIPE,stdin=subprocess.PIPE)
+        compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE,stdin=subprocess.PIPE)
         currInput = pair[0].encode()
         output = compilationProcess.communicate(input=currInput)[0]
         print(output)
+        #setja compare fall her
 
 
 def removeFile(inputFile):
@@ -40,7 +42,7 @@ def maggi():
     #output = compilationProcess.communicate(input=dummystring)[0]
     #print(output)
     pairs = [("a","x"),("b","z"),("c","n")]
-    runCPlus(pairs,"")
+    runCPlus(pairs,"test")
 maggi()
 
 
