@@ -5,6 +5,16 @@
         <title>Upload a C++ file</title>
    </head>
    <body>
+       {% with msgs = get_flashed_messages(with_categories=true) %}
+            {% if msgs %}
+                {%- for category, msg in msgs %}
+                    <div class="alert alert-info">
+                    {{category.capitalize()}}: {{ msg }}
+                    </div>
+                {% endfor -%}
+            {% endif %}
+       {% endwith %}
+
         <h1>Upload a file to compile and run</h1>
         <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
             <p>
@@ -12,5 +22,5 @@
                 <input type="submit" value="Upload">
             </p>
         </form>
-    </body>
+   </body>
 </html>
