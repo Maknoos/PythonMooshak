@@ -5,6 +5,8 @@ import os
 import difflib
 from subprocess import TimeoutExpired
 
+answerDict = {}
+
 def compileCPlus(inputFile):
     exeFile = inputFileToExe(inputFile)  #replace .cpp with .exe
     compilationProcess = subprocess.Popen([r"/usr/bin/g++",inputFile,"-o",exeFile],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
@@ -22,7 +24,6 @@ def runCPlus(pairs,inputFile):
     for pair in pairs:
         compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE,stdin=subprocess.PIPE)
         currInput = pair[0].encode()
-
         try:
             output = compilationProcess.communicate(input=currInput,timeout=5)[0].decode()
         except TimeoutExpired:
@@ -34,6 +35,21 @@ def runCPlus(pairs,inputFile):
 
     return differences
 
+#input is list of strings to test
+def generateAnswers(inputFile, input):
+    answers = []
+    compileCPlus(inputFile)
+    runString = inputFileToExe(inputFile)
+    for inp in input:
+        compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+        #currInput = inp.encode()
+        try:
+            output = compilationProcess.communicate(input=inp.encode(), timeout=5)[0].decode()
+            answers.append((inp,output))
+        except TimeoutExpired:
+            compilationProcess.kill()
+            raise Exception
+    return answers
 
 def removeFile(inputFile):
     os.remove(inputFileToExe(inputFile))
@@ -44,10 +60,10 @@ def inputFileToExe(inputFile):
 #takes in the output from the compiled program and compares it to a file with correct output
 def compare(obtained,expected):
     if(obtained == expected):
-        print ("ACCEPTED!")
+        print ("Test case passed!")
         return ""
     else:
-        print ("WRONG ANSWER")
+        print ("Test case failed!")
         #HTML TABLE if we want
 
         difference = difflib.HtmlDiff().make_table(obtained.splitlines(), expected.splitlines())
@@ -56,20 +72,18 @@ def compare(obtained,expected):
         #difference = '\n'.join(difflib.Differ().compare(obtained.splitlines(), expected.splitlines()))
         return difference
 
-def testFile(inputFile,testStrings):
+def testFile(problemID, inputFile):
     result = ""
     feedBack = []
-
     try:
         compileCPlus(inputFile)
     except Exception as compileError:
         return "Compile Time error" , [str(compileError)]
 
     try:
-        feedBack = runCPlus([("a","a\n")],inputFile)
+        feedBack = runCPlus(answerDict[problemID]['Answers'],inputFile)
     except Exception as TimeOut:
         return("Time limit exceeded",[])
-
     if len(feedBack)!=0:
         result = "Wrong Answer"
     else:
@@ -79,13 +93,57 @@ def testFile(inputFile,testStrings):
 
 #print (compileCPlus())
 
+#we dont save the inputFile for now.. just answers and id of the problem
+def createProblem(problemName, problemDescription, inputFile, testCases, valgrind = False, timeout = 0):
+
+    ID = len(answerDict.keys())
+    answerDict[ID] = {}
+    initProblemDicts(answerDict[ID])
+
+    answerDict[ID]['Name'] = problemName
+    answerDict[ID]['Description'] = problemDescription
+    answerDict[ID]['Answers'] = generateAnswers(inputFile,testCases)
+    answerDict[ID]['Timeout'] = timeout
+    answerDict[ID]['Valgrind'] = valgrind
+    removeFile(inputFile)
+
+
+def initProblemDicts(dict):
+    dict['Name'] = {}
+    dict['Description'] = {}
+    dict['Answers'] = {}
+    dict['Timeout'] = {}
+    dict['Valgrind'] = {}
+
 #print(platform.system())
+#returns tuple of keys and name of problem
+def getDictKeysAndName():
+    return [(x , answerDict[x]['Name']) for x in answerDict]
+
+def initTestData():
+    createProblem("Is Palindrome", "..", "./correctIsPalindrome.cpp", ['tacocat', 'not','aaaaa'])
+    createProblem("Pogba Goal", "..", "./correctPogba.cpp", ['x', 'k'])
+    createProblem("Only Digits", "..", "./correctOnlyDigits.cpp", ['18534', 'asdfd', '1?#3'])
+
+
 def KG():
-    answer = "POGBOOM SCORES INCREDIBLE GOAL\nIBRAKADABRA"
-    myTestInputFile = "./pogba.cpp"
-    compileCPlus(myTestInputFile)
-    runCPlus([("x", answer), ("wrong",answer)], myTestInputFile)
-    removeFile(myTestInputFile)
+    InputFile = "./forever.cpp"
+    #InputFile = "./wrongIsPalindrome.cpp"
+    #InputFile = "./correctIsPalindrome.cpp"
+
+    #create problem
+    initTestData()
+    # test problem with id
+    problemID = getDictKeysAndName()[0][0]  # hardcoded to test
+
+
+
+
+    print (testFile(problemID, InputFile)[0])
+
+    #compileCPlus(InputFile)
+    #runCPlus(answerDict[problemID]['Answers'], InputFile)
+    #removeFile(InputFile)
 KG()
 
 
