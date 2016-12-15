@@ -20,7 +20,7 @@ def runCPlus(pairs,inputFile):
         currInput = pair[0].encode()
         output = compilationProcess.communicate(input=currInput)[0].decode()
         #setja compare fall her
-        compare(output,pair[1]) #HARDCODED ANSWER FILE for now, should be determined by which assignment user is handing in
+        print(compare(output,pair[1])) #HARDCODED ANSWER FILE for now, should be determined by which assignment user is handing in
 
 
 
@@ -62,13 +62,13 @@ def KG():
 
 
 def maggi():
-    compileCPlus()
+    compileCPlus("./test.cpp")
     #compilationProcess = subprocess.Popen(["./test.exe"], stdout=subprocess.PIPE,stdin=subprocess.PIPE)
     #dummystring = ("input").encode()
     #output = compilationProcess.communicate(input=dummystring)[0]
     #print(output)
-    pairs = [("a","x"),("b","z"),("c","n")]
-    runCPlus(pairs,"test")
-#maggi()
+    pairs = [("a","a\n"),("b","z"),("c","n")]
+    runCPlus(pairs,"./test.cpp")
+maggi()
 
 
