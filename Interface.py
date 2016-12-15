@@ -1,10 +1,10 @@
 import os
 from flask import Flask, render_template, request, redirect, Markup
 from werkzeug.utils import secure_filename
-from Domain import testFile
+from Domain import testFile, getDictKeysAndName, getNameAndDescription
 
 UPLOAD_FOLDER = os.path.dirname(os.path.abspath(__file__))
-ALLOWED_EXTENSIONS = set(['cpp'])          # haegt ad setja fleiri endingar
+ALLOWED_EXTENSIONS = set(['cpp', 'c'])          # haegt ad setja fleiri endingar
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -16,7 +16,13 @@ def allowed_file(filename):
 
 @app.route("/")
 def index():
-    return render_template('index.html')
+    problems = getDictKeysAndName()
+    return render_template('index.html', problems=problems)
+
+@app.route("/handin/<pid>")
+def handin(pid):
+    result = getNameAndDescription(pid)
+    return render_template('handin.html', pid=pid, result=result)
 
 # athuga med villumedhondlun
 @app.route('/upload', methods=['POST'])
@@ -43,7 +49,7 @@ def upload():
         file.save(destination)
 
         # senda a domain og fa nidurstodur tilbaka
-        ans, testC = testFile(destination, "")
+        ans, testC = testFile(pid, destination)
 
         for i in testC:
             testC = i
