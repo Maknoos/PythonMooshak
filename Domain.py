@@ -3,14 +3,17 @@ import platform
 import re
 import os
 import difflib
-from subprocess import TimeoutExpired
+from subprocess import TimeoutExpired #for some reason this isn't included when importing subprocess
+
+class compileTimeException(Exception):
+    pass
 
 def compileCPlus(inputFile):
     exeFile = inputFileToExe(inputFile)  #replace .cpp with .exe
     compilationProcess = subprocess.Popen([r"/usr/bin/g++",inputFile,"-o",exeFile],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     error  = compilationProcess.communicate()[1].decode()
     if  error != "":
-        raise Exception(error)
+        raise compileTimeException(error)
 
     #return output
 
@@ -22,11 +25,12 @@ def runCPlus(pairs,inputFile):
     for pair in pairs:
         compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE,stdin=subprocess.PIPE)
         currInput = pair[0].encode()
+        print(runString)
         try:
             output = compilationProcess.communicate(input=currInput,timeout=5)[0].decode()
         except TimeoutExpired:
             compilationProcess.kill()
-            raise Exception
+            raise
         result = compare(output,pair[1]) #HARDCODED ANSWER FILE for now, should be determined by which assignment user is handing it
         if result != "":
             differences.append(result)
@@ -59,12 +63,12 @@ def testFile(inputFile,testStrings):
 
     try:
         compileCPlus(inputFile)
-    except Exception as compileError:
+    except compileTimeException as compileError:
         return "Compile Time error" , [str(compileError)]
 
     try:
         feedBack = runCPlus([("a","a\n")],inputFile)
-    except Exception as TimeOut:
+    except TimeoutExpired:
         return("Time limit exceeded",[])
 
     if len(feedBack)!=0:
@@ -110,7 +114,7 @@ def maggi():
     #print(output)
     #pairs = [("a","a\n"),("b","z"),("c","n")]
     #res  = runCPlus(pairs,"./test.cpp")
-    #print(testFile("./test.cpp",""))
+    print(testFile("./test.cpp",""))
     #print("jebb")
     #process = subprocess.Popen(["valgrind","--leak-check=yes","./test.exe"],stdout=subprocess.PIPE,stdin=subprocess.PIPE,stderr=subprocess.PIPE)
     #output = process.communicate()[1]
@@ -121,6 +125,6 @@ def maggi():
     #success = valgrindCheck("./noerrors.cpp")
     #print("success"+success+"success")
     #print("fail"+fail+"fail")
-#maggi()
+maggi()
 
 
