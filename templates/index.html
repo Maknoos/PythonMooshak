@@ -1,16 +1,26 @@
-<!doctype html>
-<html>
-   <head>
-       <meta charset="UTF-8">
-        <title>Upload a C++ file</title>
-   </head>
-   <body>
-        <h1>Upload a file to compile and run</h1>
-        <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
-            <p>
-                <input type="file" name="file"><br/>
-                <input type="submit" value="Upload">
-            </p>
-        </form>
-   </body>
-</html>
+{% extends "layout.html" %}
+{% block body %}
+
+<h1>Problem 1</h1>
+<form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+    <div>
+        <input type="hidden" name="pid" value="1">
+    </div>
+    <p>
+        <input type="file" name="file"><br/>
+        <input type="submit" value="Upload">
+    </p>
+</form>
+
+<h1>Problem 2</h1>
+<form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+    <div>
+        <input type="hidden" name="pid" value="2">
+    </div>
+    <p>
+        <input type="file" name="file"><br/>
+        <input type="submit" value="Upload">
+    </p>
+</form>
+
+{% endblock %}
