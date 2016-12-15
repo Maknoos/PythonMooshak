@@ -7,7 +7,9 @@ import difflib
 def compileCPlus(inputFile):
     exeFile = inputFileToExe(inputFile)  #replace .cpp with .exe
     compilationProcess = subprocess.Popen([r"/usr/bin/g++",inputFile,"-o",exeFile],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    compilationProcess.communicate()
+    error  = compilationProcess.communicate()[1].decode()
+    if  error != "":
+        raise Exception(error)
 
     #return output
 
@@ -50,7 +52,10 @@ def compare(obtained,expected):
 def testFile(inputFile,testStrings):
     result = ""
     feedBack = ""
-    compileCPlus(inputFile)
+    try:
+        compileCPlus(inputFile)
+    except Exception as compileError:
+        return "Compile Time error" , str(compileError)
     feedBack = runCPlus([("a","b")],inputFile)
     if len(feedBack)!=0:
         result = "Wrong Answer"
@@ -72,7 +77,10 @@ def KG():
 
 
 def maggi():
-    #compileCPlus("./test.cpp")
+    #try:
+    #   compileCPlus("./test.cpp")
+    #except Exception as e:
+    #    print(str(e))
     #compilationProcess = subprocess.Popen(["./test.exe"], stdout=subprocess.PIPE,stdin=subprocess.PIPE)
     #dummystring = ("input").encode()
     #output = compilationProcess.communicate(input=dummystring)[0]
@@ -80,6 +88,6 @@ def maggi():
     #pairs = [("a","a\n"),("b","z"),("c","n")]
     #res  = runCPlus(pairs,"./test.cpp")
     print(testFile("./test.cpp",""))
-maggi()
+#maggi()
 
 
