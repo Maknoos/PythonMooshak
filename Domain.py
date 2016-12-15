@@ -22,7 +22,6 @@ def runCPlus(pairs,inputFile):
         compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE,stdin=subprocess.PIPE)
         currInput = pair[0].encode()
         output = compilationProcess.communicate(input=currInput)[0].decode()
-        #setja compare fall her
         result = compare(output,pair[1]) #HARDCODED ANSWER FILE for now, should be determined by which assignment user is handing it
         if result != "":
             differences.append(result)
@@ -55,8 +54,8 @@ def testFile(inputFile,testStrings):
     try:
         compileCPlus(inputFile)
     except Exception as compileError:
-        return "Compile Time error" , str(compileError)
-    feedBack = runCPlus([("a","b")],inputFile)
+        return "Compile Time error" , [str(compileError)]
+    feedBack = runCPlus([("a","a\n")],inputFile)
     if len(feedBack)!=0:
         result = "Wrong Answer"
     else:
@@ -88,6 +87,6 @@ def maggi():
     #pairs = [("a","a\n"),("b","z"),("c","n")]
     #res  = runCPlus(pairs,"./test.cpp")
     print(testFile("./test.cpp",""))
-#maggi()
+maggi()
 
 
