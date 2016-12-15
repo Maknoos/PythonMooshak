@@ -1,7 +1,7 @@
 import os
-from flask import Flask, render_template, request, redirect, flash
+from flask import Flask, render_template, request, redirect, Markup
 from werkzeug.utils import secure_filename
-from Domain import compileCPlus
+from Domain import testFile
 
 UPLOAD_FOLDER = os.path.dirname(os.path.abspath(__file__))
 ALLOWED_EXTENSIONS = set(['cpp'])          # haegt ad setja fleiri endingar
@@ -31,6 +31,7 @@ def upload():
         return redirect(request.url)        # redirecta aftur á upphafsidu?
 
     file = request.files['file']
+    pid = request.form['pid']               # senda með
 
     # if user does not select file, browser also
     # submit a empty part without filename
@@ -42,8 +43,16 @@ def upload():
         file.save(destination)
 
         # senda a domain og fa nidurstodur tilbaka
-        # compileCPlus()
-        return render_template("complete.html")
+        ans, testC = testFile(destination, "")
+
+        for i in testC:
+            testC = i
+
+        if testC:
+            testC = testC.replace('\n', '')
+            testC = Markup(testC)
+
+        return render_template("complete.html", answer = ans, testCases = testC)
 
 if __name__ == "__main__":
     app.run()
