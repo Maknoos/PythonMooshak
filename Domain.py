@@ -130,13 +130,13 @@ def initTestData():
 
 
 def KG():
-    InputFile = "./leak.cpp"
+    InputFile = "./test.cpp"
     #InputFile = "./forever.cpp"
     #InputFile = "./wrongIsPalindrome.cpp"
     #InputFile = "./correctIsPalindrome.cpp"
 
     #create problem
-    initTestData()
+    #initTestData()
     # test problem with id
     #problemID = getDictKeysAndName()[0][0]  # hardcoded to test
     #print (testFile(problemID, InputFile)[0])
@@ -174,7 +174,7 @@ def maggi():
     #print(output)
     #pairs = [("a","a\n"),("b","z"),("c","n")]
     #res  = runCPlus(pairs,"./test.cpp")
-    print(testFile("./test.cpp",""))
+    #print(testFile("./test.cpp",""))
     #print("jebb")
     #process = subprocess.Popen(["valgrind","--leak-check=yes","./test.exe"],stdout=subprocess.PIPE,stdin=subprocess.PIPE,stderr=subprocess.PIPE)
     #output = process.communicate()[1]
