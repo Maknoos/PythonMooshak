@@ -3,7 +3,10 @@ import platform
 import re
 import os
 import difflib
-from subprocess import TimeoutExpired
+from subprocess import TimeoutExpired #for some reason this isn't included when importing subprocess
+
+class compileTimeException(Exception):
+    pass
 
 answerDict = {}
 
@@ -12,7 +15,7 @@ def compileCPlus(inputFile):
     compilationProcess = subprocess.Popen([r"/usr/bin/g++",inputFile,"-o",exeFile],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     error  = compilationProcess.communicate()[1].decode()
     if  error != "":
-        raise Exception(error)
+        raise compileTimeException(error)
 
     #return output
 
@@ -28,8 +31,9 @@ def runCPlus(pairs,inputFile):
             output = compilationProcess.communicate(input=currInput,timeout=5)[0].decode()
         except TimeoutExpired:
             compilationProcess.kill()
-            raise Exception
-        result = compare(output,pair[1])
+            raise
+        result = compare(output,pair[1]) #HARDCODED ANSWER FILE for now, should be determined by which assignment user is handing it
+
         if result != "":
             differences.append(result)
 
@@ -77,12 +81,11 @@ def testFile(problemID, inputFile):
     feedBack = []
     try:
         compileCPlus(inputFile)
-    except Exception as compileError:
+    except compileTimeException as compileError:
         return "Compile Time error" , [str(compileError)]
-
     try:
         feedBack = runCPlus(answerDict[problemID]['Answers'],inputFile)
-    except Exception as TimeOut:
+    except TimeoutExpired:
         return("Time limit exceeded",[])
     if len(feedBack)!=0:
         result = "Wrong Answer"
@@ -127,31 +130,44 @@ def initTestData():
 
 
 def KG():
-    InputFile = "./forever.cpp"
+    InputFile = "./leak.cpp"
+    #InputFile = "./forever.cpp"
     #InputFile = "./wrongIsPalindrome.cpp"
     #InputFile = "./correctIsPalindrome.cpp"
 
     #create problem
     initTestData()
     # test problem with id
-    problemID = getDictKeysAndName()[0][0]  # hardcoded to test
+    #problemID = getDictKeysAndName()[0][0]  # hardcoded to test
+    #print (testFile(problemID, InputFile)[0])
 
 
 
-
-    print (testFile(problemID, InputFile)[0])
-
-    #compileCPlus(InputFile)
+    compileCPlus(InputFile)
+    print (valgrindCheck(InputFile))
     #runCPlus(answerDict[problemID]['Answers'], InputFile)
     #removeFile(InputFile)
-KG()
 
+
+
+def valgrindCheck(inputFile):
+    #ATH ./
+    inputFile = inputFileToExe(inputFile)
+    memoryProcess = subprocess.Popen(["valgrind","--leak-check=yes",inputFile],stdin=subprocess.PIPE,stderr=subprocess.PIPE)
+    output = memoryProcess.communicate()[1].decode()
+
+    if hasErrors(output):
+        return output
+    else:
+        return ""
+
+def hasErrors(output):
+    lines = output.splitlines()
+    errorcount = lines[-1].split(":")[1]
+    return(not "0" in errorcount)
 
 def maggi():
-    #try:
-    #   compileCPlus("./test.cpp")
-    #except Exception as e:
-    #    print(str(e))
+    pass
     #compilationProcess = subprocess.Popen(["./test.exe"], stdout=subprocess.PIPE,stdin=subprocess.PIPE)
     #dummystring = ("input").encode()
     #output = compilationProcess.communicate(input=dummystring)[0]
@@ -159,6 +175,17 @@ def maggi():
     #pairs = [("a","a\n"),("b","z"),("c","n")]
     #res  = runCPlus(pairs,"./test.cpp")
     print(testFile("./test.cpp",""))
+    #print("jebb")
+    #process = subprocess.Popen(["valgrind","--leak-check=yes","./test.exe"],stdout=subprocess.PIPE,stdin=subprocess.PIPE,stderr=subprocess.PIPE)
+    #output = process.communicate()[1]
+    #readable = output.splitlines()
+    #for i in readable:
+        #print(i)
+    #fail = valgrindCheck("./test.cpp")
+    #success = valgrindCheck("./noerrors.cpp")
+    #print("success"+success+"success")
+    #print("fail"+fail+"fail")
 #maggi()
 
 
+KG()
