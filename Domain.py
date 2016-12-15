@@ -38,7 +38,9 @@ def compare(obtained,expected):
     else:
         print ("WRONG ANSWER")
         #HTML TABLE if we want
+
         difference = difflib.HtmlDiff().make_table(obtained.splitlines(), expected.splitlines())
+        #difference = difflib.HtmlDiff().make_file(obtained.splitlines(), expected.splitlines())
 
         #difference = '\n'.join(difflib.Differ().compare(obtained.splitlines(), expected.splitlines()))
         return difference
@@ -58,7 +60,7 @@ def KG():
     compileCPlus(myTestInputFile)
     runCPlus([("x", answer), ("wrong",answer)], myTestInputFile)
     removeFile(myTestInputFile)
-#KG()
+KG()
 
 
 def maggi():
