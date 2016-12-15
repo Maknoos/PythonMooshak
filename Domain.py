@@ -22,7 +22,8 @@ def compileCPlus(inputFile):
 
 
 def runCPlus(pairs,inputFile):
-    #runString = "./" + inputFileToExe(inputFile)
+    #runString = "./" + inputFileToExe(inpuls
+    # tFile)
     differences = []
     runString = inputFileToExe(inputFile)
     for pair in pairs:
@@ -33,7 +34,7 @@ def runCPlus(pairs,inputFile):
         except TimeoutExpired:
             compilationProcess.kill()
             raise
-        result = compare(output,pair[1]) #HARDCODED ANSWER FILE for now, should be determined by which assignment user is handing it
+        result = compare(output,pair[1])
 
         if result != "":
             differences.append(result)
@@ -60,7 +61,11 @@ def removeFile(inputFile):
     os.remove(inputFileToExe(inputFile))
 
 def inputFileToExe(inputFile):
-    return re.sub(".cpp$",".exe",inputFile)
+    if ".cpp" in inputFile: #hvað ef hún heitir asshole.cpp.c?
+        return re.sub(".cpp$",".exe",inputFile)
+    else:
+        return re.sub(".c$", ".exe", inputFile)
+    #ATH skrifa sem snyrtilegri lausn
 
 #takes in the output from the compiled program and compares it to a file with correct output
 def compare(obtained,expected):
@@ -122,10 +127,23 @@ def initProblemDicts(dict):
     dict['Valgrind'] = {}
     dict['Language'] = {}
 
+def getNameAndDescription(ID):
+    #data = {}
+    #data.setdefault('Name',answerDict[ID]['Name'])
+    #data.setdefault('Description',answerDict[ID]['Description'])
+    #return data
+    #Hardcoded for now
+
+    data = {}
+    data.setdefault('Name',"Placeholder name")
+    data.setdefault('Description',"This is a random line of text that should be replaced with real data before the assignment is handed in")
+    return data
+
 #print(platform.system())
 #returns tuple of keys and name of problem
 def getDictKeysAndName():
-    return [(x , answerDict[x]['Name']) for x in answerDict]
+    #return [(x , answerDict[x]['Name']) for x in answerDict] #needs to be sorted by keys..
+    return[(1,"Palindromes"),(2,"Ants & Bugs"),(3,"stringcalculator"),(10,"samlagning"),(20,"deiling"),(21,"stringProcessing")]
 
 def initTestData():
     createProblem("Is Palindrome", "..", "./correctIsPalindrome.cpp", ['tacocat', 'not','aaaaa'])
@@ -140,14 +158,21 @@ def exitAndSave():
     with open('AnswerDictionary.json', 'w') as f:
         json.dump(answerDict, f)
 def KG():
+
     #InputFile = "./leak.cpp"
+
+    #InputFile = "./test.cpp"
+
     #InputFile = "./forever.cpp"
     #InputFile = "./wrongIsPalindrome.cpp"
     InputFile = "./correctIsPalindrome.cpp"
 
     #create problem
     #initTestData()
+
     init()
+    print("hi")
+
     # test problem with id
     problemID = getDictKeysAndName()[0][0]  # hardcoded to test
     print(answerDict)
@@ -178,21 +203,28 @@ def hasErrors(output):
     errorcount = lines[-1].split(":")[1]
     return(not "0" in errorcount)
 
+
+def compileC(inputFile):
+    exeFile = inputFileToExe(inputFile)  #replace .cpp with .exe
+    compilationProcess = subprocess.Popen([r"/usr/bin/gcc",inputFile,"-o",exeFile],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    error  = compilationProcess.communicate()[1].decode()
+    if  error != "":
+        raise compileTimeException(error)
+    #sameina með C++
+
+
 def maggi():
     pass
+    #compileCPlus("./test.cpp")
+    #compileC("gylfi.c")
+    #pairs = [("a", "a\n"), ("b", "HelloWorld"), ("c", "n")]
+    #res  = runCPlus(pairs,"./gylfi.c")
     #compilationProcess = subprocess.Popen(["./test.exe"], stdout=subprocess.PIPE,stdin=subprocess.PIPE)
     #dummystring = ("input").encode()
     #output = compilationProcess.communicate(input=dummystring)[0]
     #print(output)
-    #pairs = [("a","a\n"),("b","z"),("c","n")]
-    #res  = runCPlus(pairs,"./test.cpp")
-    print(testFile("./test.cpp",""))
-    #print("jebb")
     #process = subprocess.Popen(["valgrind","--leak-check=yes","./test.exe"],stdout=subprocess.PIPE,stdin=subprocess.PIPE,stderr=subprocess.PIPE)
     #output = process.communicate()[1]
-    #readable = output.splitlines()
-    #for i in readable:
-        #print(i)
     #fail = valgrindCheck("./test.cpp")
     #success = valgrindCheck("./noerrors.cpp")
     #print("success"+success+"success")
