@@ -3,6 +3,7 @@ import platform
 import re
 import os
 import difflib
+import json
 from subprocess import TimeoutExpired #for some reason this isn't included when importing subprocess
 
 class compileTimeException(Exception):
@@ -74,6 +75,7 @@ def compare(obtained,expected):
         #difference = difflib.HtmlDiff().make_file(obtained.splitlines(), expected.splitlines())
 
         #difference = '\n'.join(difflib.Differ().compare(obtained.splitlines(), expected.splitlines()))
+        #print(difference)
         return difference
 
 def testFile(problemID, inputFile):
@@ -108,6 +110,7 @@ def createProblem(problemName, problemDescription, inputFile, testCases, valgrin
     answerDict[ID]['Answers'] = generateAnswers(inputFile,testCases)
     answerDict[ID]['Timeout'] = timeout
     answerDict[ID]['Valgrind'] = valgrind
+    answerDict[ID]['Language'] = re.search('\.[^.]*$',inputFile).group()
     removeFile(inputFile)
 
 
@@ -117,6 +120,7 @@ def initProblemDicts(dict):
     dict['Answers'] = {}
     dict['Timeout'] = {}
     dict['Valgrind'] = {}
+    dict['Language'] = {}
 
 #print(platform.system())
 #returns tuple of keys and name of problem
@@ -128,23 +132,31 @@ def initTestData():
     createProblem("Pogba Goal", "..", "./correctPogba.cpp", ['x', 'k'])
     createProblem("Only Digits", "..", "./correctOnlyDigits.cpp", ['18534', 'asdfd', '1?#3'])
 
-
+def init():
+    global answerDict
+    with open('AnswerDictionary.json', 'r') as f:
+        answerDict = json.load(f)
+def exitAndSave():
+    with open('AnswerDictionary.json', 'w') as f:
+        json.dump(answerDict, f)
 def KG():
-    InputFile = "./leak.cpp"
+    #InputFile = "./leak.cpp"
     #InputFile = "./forever.cpp"
     #InputFile = "./wrongIsPalindrome.cpp"
-    #InputFile = "./correctIsPalindrome.cpp"
+    InputFile = "./correctIsPalindrome.cpp"
 
     #create problem
-    initTestData()
+    #initTestData()
+    init()
     # test problem with id
-    #problemID = getDictKeysAndName()[0][0]  # hardcoded to test
-    #print (testFile(problemID, InputFile)[0])
-
+    problemID = getDictKeysAndName()[0][0]  # hardcoded to test
+    print(answerDict)
 
 
     compileCPlus(InputFile)
-    print (valgrindCheck(InputFile))
+    print (testFile('0', InputFile)[0])
+    exitAndSave()
+    #print (valgrindCheck(InputFile))
     #runCPlus(answerDict[problemID]['Answers'], InputFile)
     #removeFile(InputFile)
 
