@@ -1,7 +1,12 @@
 #include <iostream>
 using namespace std;
 
-int main(){
-	cout << "koma svo gulir!!" << endl;
+int main() {
+	char a = 0;
+
+	cin >> a;
+
+	cout << a << endl;
+
 	return 0;
 }
