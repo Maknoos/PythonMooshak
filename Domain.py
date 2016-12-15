@@ -7,21 +7,26 @@ import difflib
 def compileCPlus(inputFile):
     exeFile = inputFileToExe(inputFile)  #replace .cpp with .exe
     compilationProcess = subprocess.Popen([r"/usr/bin/g++",inputFile,"-o",exeFile],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    compilationProcess.communicate()
+    error  = compilationProcess.communicate()[1].decode()
+    if  error != "":
+        raise Exception(error)
 
     #return output
 
 
 def runCPlus(pairs,inputFile):
     #runString = "./" + inputFileToExe(inputFile) #inputFile has to be .cpp?
+    differences = []
     runString = inputFileToExe(inputFile) #þegar ég notaði slóð sem byrjaði á ./  annars ekki hægt að vísa í aftari möppur
     for pair in pairs:
         compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE,stdin=subprocess.PIPE)
         currInput = pair[0].encode()
         output = compilationProcess.communicate(input=currInput)[0].decode()
-        #setja compare fall her
-        compare(output,pair[1]) #HARDCODED ANSWER FILE for now, should be determined by which assignment user is handing in
+        result = compare(output,pair[1]) #HARDCODED ANSWER FILE for now, should be determined by which assignment user is handing it
+        if result != "":
+            differences.append(result)
 
+    return differences
 
 
 def removeFile(inputFile):
@@ -46,10 +51,19 @@ def compare(obtained,expected):
         return difference
 
 def testFile(inputFile,testStrings):
-    compileCPlus(inputFile)
-    runCPlus(("a","x"),inputFile)
+    result = ""
+    feedBack = ""
+    try:
+        compileCPlus(inputFile)
+    except Exception as compileError:
+        return "Compile Time error" , [str(compileError)]
+    feedBack = runCPlus([("a","a\n")],inputFile)
+    if len(feedBack)!=0:
+        result = "Wrong Answer"
+    else:
+        result = "Accepted"
     removeFile(inputFile)
-    pass
+    return result, feedBack
 
 #print (compileCPlus())
 
@@ -64,13 +78,17 @@ KG()
 
 
 def maggi():
-    compileCPlus()
+    #try:
+    #   compileCPlus("./test.cpp")
+    #except Exception as e:
+    #    print(str(e))
     #compilationProcess = subprocess.Popen(["./test.exe"], stdout=subprocess.PIPE,stdin=subprocess.PIPE)
     #dummystring = ("input").encode()
     #output = compilationProcess.communicate(input=dummystring)[0]
     #print(output)
-    pairs = [("a","x"),("b","z"),("c","n")]
-    runCPlus(pairs,"test")
-#maggi()
+    #pairs = [("a","a\n"),("b","z"),("c","n")]
+    #res  = runCPlus(pairs,"./test.cpp")
+    print(testFile("./test.cpp",""))
+maggi()
 
 
