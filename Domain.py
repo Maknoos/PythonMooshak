@@ -86,18 +86,41 @@ def KG():
 #KG()
 
 
+def valgrindCheck(inputFile):
+    #ATH ./
+    inputFile = inputFileToExe(inputFile)
+    memoryProcess = subprocess.Popen(["valgrind","--leak-check=yes",inputFile],stdin=subprocess.PIPE,stderr=subprocess.PIPE)
+    output = memoryProcess.communicate()[1].decode()
+
+    if hasErrors(output):
+        return output
+    else:
+        return ""
+
+def hasErrors(output):
+    lines = output.splitlines()
+    errorcount = lines[-1].split(":")[1]
+    return(not "0" in errorcount)
+
 def maggi():
-    #try:
-    #   compileCPlus("./test.cpp")
-    #except Exception as e:
-    #    print(str(e))
+    pass
     #compilationProcess = subprocess.Popen(["./test.exe"], stdout=subprocess.PIPE,stdin=subprocess.PIPE)
     #dummystring = ("input").encode()
     #output = compilationProcess.communicate(input=dummystring)[0]
     #print(output)
     #pairs = [("a","a\n"),("b","z"),("c","n")]
     #res  = runCPlus(pairs,"./test.cpp")
-    print(testFile("./test.cpp",""))
-maggi()
+    #print(testFile("./test.cpp",""))
+    #print("jebb")
+    #process = subprocess.Popen(["valgrind","--leak-check=yes","./test.exe"],stdout=subprocess.PIPE,stdin=subprocess.PIPE,stderr=subprocess.PIPE)
+    #output = process.communicate()[1]
+    #readable = output.splitlines()
+    #for i in readable:
+        #print(i)
+    #fail = valgrindCheck("./test.cpp")
+    #success = valgrindCheck("./noerrors.cpp")
+    #print("success"+success+"success")
+    #print("fail"+fail+"fail")
+#maggi()
 
 
