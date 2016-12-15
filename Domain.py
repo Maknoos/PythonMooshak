@@ -21,7 +21,8 @@ def compileCPlus(inputFile):
 
 
 def runCPlus(pairs,inputFile):
-    #runString = "./" + inputFileToExe(inputFile)
+    #runString = "./" + inputFileToExe(inpuls
+    # tFile)
     differences = []
     runString = inputFileToExe(inputFile)
     for pair in pairs:
@@ -59,7 +60,11 @@ def removeFile(inputFile):
     os.remove(inputFileToExe(inputFile))
 
 def inputFileToExe(inputFile):
-    return re.sub(".cpp$",".exe",inputFile)
+    if ".cpp" in inputFile:
+        return re.sub(".cpp$",".exe",inputFile)
+    else:
+        return re.sub(".c$", ".exe", inputFile)
+    #ATH skrifa sem snyrtilegri lausn
 
 #takes in the output from the compiled program and compares it to a file with correct output
 def compare(obtained,expected):
@@ -121,7 +126,8 @@ def initProblemDicts(dict):
 #print(platform.system())
 #returns tuple of keys and name of problem
 def getDictKeysAndName():
-    return [(x , answerDict[x]['Name']) for x in answerDict]
+    #return [(x , answerDict[x]['Name']) for x in answerDict]
+    return[(1,"Palindromes"),(2,"Ants & Bugs"),(3,"stringcalculator"),(10,"samlagning"),(20,"deiling"),(21,"stringProcessing")]
 
 def initTestData():
     createProblem("Is Palindrome", "..", "./correctIsPalindrome.cpp", ['tacocat', 'not','aaaaa'])
@@ -166,21 +172,28 @@ def hasErrors(output):
     errorcount = lines[-1].split(":")[1]
     return(not "0" in errorcount)
 
+
+def compileC(inputFile):
+    exeFile = inputFileToExe(inputFile)  #replace .cpp with .exe
+    compilationProcess = subprocess.Popen([r"/usr/bin/gcc",inputFile,"-o",exeFile],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    error  = compilationProcess.communicate()[1].decode()
+    if  error != "":
+        raise compileTimeException(error)
+    #sameina með C++
+
+
 def maggi():
     pass
+    #compileCPlus("./test.cpp")
+    #compileC("gylfi.c")
+    #pairs = [("a", "a\n"), ("b", "HelloWorld"), ("c", "n")]
+    #res  = runCPlus(pairs,"./gylfi.c")
     #compilationProcess = subprocess.Popen(["./test.exe"], stdout=subprocess.PIPE,stdin=subprocess.PIPE)
     #dummystring = ("input").encode()
     #output = compilationProcess.communicate(input=dummystring)[0]
     #print(output)
-    #pairs = [("a","a\n"),("b","z"),("c","n")]
-    #res  = runCPlus(pairs,"./test.cpp")
-    #print(testFile("./test.cpp",""))
-    #print("jebb")
     #process = subprocess.Popen(["valgrind","--leak-check=yes","./test.exe"],stdout=subprocess.PIPE,stdin=subprocess.PIPE,stderr=subprocess.PIPE)
     #output = process.communicate()[1]
-    #readable = output.splitlines()
-    #for i in readable:
-        #print(i)
     #fail = valgrindCheck("./test.cpp")
     #success = valgrindCheck("./noerrors.cpp")
     #print("success"+success+"success")
@@ -188,4 +201,4 @@ def maggi():
 #maggi()
 
 
-KG()
+#KG()
