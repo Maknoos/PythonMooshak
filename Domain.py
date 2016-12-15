@@ -15,14 +15,14 @@ def compileCPlus(inputFile):
 
 
 def runCPlus(pairs,inputFile):
-    #runString = "./" + inputFileToExe(inputFile) #inputFile has to be .cpp?
+    #runString = "./" + inputFileToExe(inputFile)
     differences = []
-    runString = inputFileToExe(inputFile) #þegar ég notaði slóð sem byrjaði á ./  annars ekki hægt að vísa í aftari möppur
+    runString = inputFileToExe(inputFile)
     for pair in pairs:
         compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE,stdin=subprocess.PIPE)
         currInput = pair[0].encode()
         output = compilationProcess.communicate(input=currInput)[0].decode()
-        result = compare(output,pair[1]) #HARDCODED ANSWER FILE for now, should be determined by which assignment user is handing it
+        result = compare(output,pair[1])
         if result != "":
             differences.append(result)
 
@@ -74,7 +74,7 @@ def KG():
     compileCPlus(myTestInputFile)
     runCPlus([("x", answer), ("wrong",answer)], myTestInputFile)
     removeFile(myTestInputFile)
-KG()
+#KG()
 
 
 def maggi():
@@ -89,6 +89,6 @@ def maggi():
     #pairs = [("a","a\n"),("b","z"),("c","n")]
     #res  = runCPlus(pairs,"./test.cpp")
     print(testFile("./test.cpp",""))
-maggi()
+#maggi()
 
 
