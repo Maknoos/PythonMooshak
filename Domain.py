@@ -3,6 +3,7 @@ import platform
 import re
 import os
 import difflib
+from subprocess import TimeoutExpired
 
 def compileCPlus(inputFile):
     exeFile = inputFileToExe(inputFile)  #replace .cpp with .exe
@@ -21,7 +22,11 @@ def runCPlus(pairs,inputFile):
     for pair in pairs:
         compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE,stdin=subprocess.PIPE)
         currInput = pair[0].encode()
-        output = compilationProcess.communicate(input=currInput)[0].decode()
+        try:
+            output = compilationProcess.communicate(input=currInput,timeout=5)[0].decode()
+        except TimeoutExpired:
+            compilationProcess.kill()
+            raise Exception
         result = compare(output,pair[1]) #HARDCODED ANSWER FILE for now, should be determined by which assignment user is handing it
         if result != "":
             differences.append(result)
@@ -50,12 +55,18 @@ def compare(obtained,expected):
 
 def testFile(inputFile,testStrings):
     result = ""
-    feedBack = ""
+    feedBack = []
+
     try:
         compileCPlus(inputFile)
     except Exception as compileError:
         return "Compile Time error" , [str(compileError)]
-    feedBack = runCPlus([("a","a\n")],inputFile)
+
+    try:
+        feedBack = runCPlus([("a","a\n")],inputFile)
+    except Exception as TimeOut:
+        return("Time limit exceeded",[])
+
     if len(feedBack)!=0:
         result = "Wrong Answer"
     else:
