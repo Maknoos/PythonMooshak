@@ -126,7 +126,8 @@ def initProblemDicts(dict):
 #print(platform.system())
 #returns tuple of keys and name of problem
 def getDictKeysAndName():
-    return [(x , answerDict[x]['Name']) for x in answerDict]
+    #return [(x , answerDict[x]['Name']) for x in answerDict]
+    return[(1,"Palindromes"),(2,"Ants & Bugs"),(3,"stringcalculator"),(10,"samlagning"),(20,"deiling"),(21,"stringProcessing")]
 
 def initTestData():
     createProblem("Is Palindrome", "..", "./correctIsPalindrome.cpp", ['tacocat', 'not','aaaaa'])
@@ -178,6 +179,7 @@ def compileC(inputFile):
     error  = compilationProcess.communicate()[1].decode()
     if  error != "":
         raise compileTimeException(error)
+    #sameina með C++
 
 
 def maggi():
