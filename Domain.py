@@ -14,14 +14,18 @@ def compileCPlus(inputFile):
 
 def runCPlus(pairs,inputFile):
     #runString = "./" + inputFileToExe(inputFile) #inputFile has to be .cpp?
+    differences = []
     runString = inputFileToExe(inputFile) #þegar ég notaði slóð sem byrjaði á ./  annars ekki hægt að vísa í aftari möppur
     for pair in pairs:
         compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE,stdin=subprocess.PIPE)
         currInput = pair[0].encode()
         output = compilationProcess.communicate(input=currInput)[0].decode()
         #setja compare fall her
-        print(compare(output,pair[1])) #HARDCODED ANSWER FILE for now, should be determined by which assignment user is handing in
+        result = compare(output,pair[1]) #HARDCODED ANSWER FILE for now, should be determined by which assignment user is handing it
+        if result != "":
+            differences.append(result)
 
+    return differences
 
 
 def removeFile(inputFile):
@@ -44,10 +48,16 @@ def compare(obtained,expected):
         return difference
 
 def testFile(inputFile,testStrings):
+    result = ""
+    feedBack = ""
     compileCPlus(inputFile)
-    runCPlus(("a","x"),inputFile)
+    feedBack = runCPlus([("a","b")],inputFile)
+    if len(feedBack)!=0:
+        result = "Wrong Answer"
+    else:
+        result = "Accepted"
     removeFile(inputFile)
-    pass
+    return result, feedBack
 
 #print (compileCPlus())
 
@@ -62,13 +72,14 @@ def KG():
 
 
 def maggi():
-    compileCPlus("./test.cpp")
+    #compileCPlus("./test.cpp")
     #compilationProcess = subprocess.Popen(["./test.exe"], stdout=subprocess.PIPE,stdin=subprocess.PIPE)
     #dummystring = ("input").encode()
     #output = compilationProcess.communicate(input=dummystring)[0]
     #print(output)
-    pairs = [("a","a\n"),("b","z"),("c","n")]
-    runCPlus(pairs,"./test.cpp")
+    #pairs = [("a","a\n"),("b","z"),("c","n")]
+    #res  = runCPlus(pairs,"./test.cpp")
+    print(testFile("./test.cpp",""))
 maggi()
 
 
