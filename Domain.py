@@ -3,11 +3,14 @@ import platform
 import re
 import os
 import difflib
+from subprocess import TimeoutExpired
 
 def compileCPlus(inputFile):
     exeFile = inputFileToExe(inputFile)  #replace .cpp with .exe
     compilationProcess = subprocess.Popen([r"/usr/bin/g++",inputFile,"-o",exeFile],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    compilationProcess.communicate()
+    error  = compilationProcess.communicate()[1].decode()
+    if  error != "":
+        raise Exception(error)
 
     #return output
 
@@ -19,8 +22,11 @@ def runCPlus(pairs,inputFile):
     for pair in pairs:
         compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE,stdin=subprocess.PIPE)
         currInput = pair[0].encode()
-        output = compilationProcess.communicate(input=currInput)[0].decode()
-        #setja compare fall her
+        try:
+            output = compilationProcess.communicate(input=currInput,timeout=5)[0].decode()
+        except TimeoutExpired:
+            compilationProcess.kill()
+            raise Exception
         result = compare(output,pair[1]) #HARDCODED ANSWER FILE for now, should be determined by which assignment user is handing it
         if result != "":
             differences.append(result)
@@ -49,9 +55,18 @@ def compare(obtained,expected):
 
 def testFile(inputFile,testStrings):
     result = ""
-    feedBack = ""
-    compileCPlus(inputFile)
-    feedBack = runCPlus([("a","b")],inputFile)
+    feedBack = []
+
+    try:
+        compileCPlus(inputFile)
+    except Exception as compileError:
+        return "Compile Time error" , [str(compileError)]
+
+    try:
+        feedBack = runCPlus([("a","a\n")],inputFile)
+    except Exception as TimeOut:
+        return("Time limit exceeded",[])
+
     if len(feedBack)!=0:
         result = "Wrong Answer"
     else:
@@ -72,7 +87,10 @@ def KG():
 
 
 def maggi():
-    #compileCPlus("./test.cpp")
+    #try:
+    #   compileCPlus("./test.cpp")
+    #except Exception as e:
+    #    print(str(e))
     #compilationProcess = subprocess.Popen(["./test.exe"], stdout=subprocess.PIPE,stdin=subprocess.PIPE)
     #dummystring = ("input").encode()
     #output = compilationProcess.communicate(input=dummystring)[0]
