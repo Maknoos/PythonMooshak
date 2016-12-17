@@ -21,7 +21,7 @@ def compileCPlus(inputFile):
     #return output
 
 
-def runCPlus(pairs,inputFile):
+def runCPlus(pairs,inputFile,timeLimit):
     #runString = "./" + inputFileToExe(inpuls
     # tFile)
     differences = []
@@ -30,7 +30,7 @@ def runCPlus(pairs,inputFile):
         compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE,stdin=subprocess.PIPE)
         currInput = pair[0].encode()
         try:
-            output = compilationProcess.communicate(input=currInput,timeout=5)[0].decode()
+            output = compilationProcess.communicate(input=currInput,timeout=timeLimit)[0].decode()
         except TimeoutExpired:
             compilationProcess.kill()
             raise
@@ -84,14 +84,17 @@ def compare(obtained,expected):
         return difference
 
 def testFile(problemID, inputFile):
+    init()
     result = ""
     feedBack = []
+    answers = answerDict[problemID]['Answers']
+    timeout = answerDict[problemID]['Timeout']
     try:
         compileCPlus(inputFile)
     except compileTimeException as compileError:
         return "Compile Time error" , [str(compileError)]
     try:
-        feedBack = runCPlus(answerDict[problemID]['Answers'],inputFile)
+        feedBack = runCPlus(answers,inputFile,timeout)
     except TimeoutExpired:
         return("Time limit exceeded",[])
     if len(feedBack)!=0:
@@ -142,8 +145,9 @@ def getNameAndDescription(ID):
 #print(platform.system())
 #returns tuple of keys and name of problem
 def getDictKeysAndName():
-    #return [(x , answerDict[x]['Name']) for x in answerDict] #needs to be sorted by keys..
-    return[(1,"Palindromes"),(2,"Ants & Bugs"),(3,"stringcalculator"),(10,"samlagning"),(20,"deiling"),(21,"stringProcessing")]
+    init()
+    return [(x , answerDict[x]['Name']) for x in answerDict] #needs to be sorted by keys..
+    #return[(1,"Palindromes"),(2,"Ants & Bugs"),(3,"stringcalculator"),(10,"samlagning"),(20,"deiling"),(21,"stringProcessing")]
 
 def initTestData():
     createProblem("Is Palindrome", "..", "./correctIsPalindrome.cpp", ['tacocat', 'not','aaaaa'])
@@ -231,7 +235,7 @@ def maggi():
     #success = valgrindCheck("./noerrors.cpp")
     #print("success"+success+"success")
     #print("fail"+fail+"fail")
-maggi()
+#maggi()
 
 
 #KG()
