@@ -18,8 +18,6 @@ def compileCPlus(inputFile):
     if  error != "":
         raise compileTimeException(error)
 
-    #return output
-
 
 def runCPlus(pairs,inputFile,timeLimit):
     #runString = "./" + inputFileToExe(inpuls
@@ -92,15 +90,13 @@ def testFile(problemID, inputFile):
     checkMemory = answerDict[problemID]['Valgrind']
     language  = answerDict[problemID]['Language']
     try:
-        if language == ".cpp": #sameina i fall med language sem parameter
-            compileCPlus(inputFile)
-        else:
-            compileC(inputFile)
+       compile(inputFile,language)
     except compileTimeException as compileError:
         return "Compile Time error" , [str(compileError)]
     try:
         feedBack = runCPlus(answers,inputFile,timeout)
     except TimeoutExpired:
+        removeFile(inputFile) #ath 2x kallad a , gera yfirfall
         return("Time limit exceeded",[])
     if len(feedBack)!=0: #gera hjalparfall
         result = "Wrong Answer"
@@ -217,7 +213,7 @@ def hasErrors(output):
     return(not "0" in errorcount)
 
 
-def compileC(inputFile):
+def compileC(inputFile): #eyda seinna
     exeFile = inputFileToExe(inputFile)  #replace .cpp with .exe
     compilationProcess = subprocess.Popen([r"/usr/bin/gcc",inputFile,"-o",exeFile],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     error  = compilationProcess.communicate()[1].decode()
@@ -225,10 +221,29 @@ def compileC(inputFile):
         raise compileTimeException(error)
     #sameina með C++
 
+def compileCPlus(inputFile): #eyda seinna
+    exeFile = inputFileToExe(inputFile)  #replace .cpp with .exe
+    compilationProcess = subprocess.Popen([r"/usr/bin/g++",inputFile,"-o",exeFile],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    error  = compilationProcess.communicate()[1].decode()
+    if  error != "":
+        raise compileTimeException(error)
+
+
+def compile(inputFile,language):
+    exeFile = inputFileToExe(inputFile)
+    if language == ".cpp":
+        compiler = r"/usr/bin/g++"
+    else:
+        compiler = r"/usr/bin/gcc"
+    compilationProcess = subprocess.Popen([compiler, inputFile, "-o", exeFile], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    error = compilationProcess.communicate()[1].decode()
+    if error != "":
+        raise compileTimeException(error)
+
 
 def maggi():
     init()
-    print(testFile("0","./gylfi.c"))
+    print(testFile("0","./correctIsPalindrome.cpp"))
     pass
     #compileCPlus("./test.cpp")
     #compileC("gylfi.c")
