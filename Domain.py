@@ -136,16 +136,16 @@ def initProblemDicts(dict):
     dict['Language'] = {}
 
 def getNameAndDescription(ID):
-    #data = {}
-    #data.setdefault('Name',answerDict[ID]['Name'])
-    #data.setdefault('Description',answerDict[ID]['Description'])
-    #return data
+    data = {}
+    data.setdefault('Name',answerDict[ID]['Name'])
+    data.setdefault('Description',answerDict[ID]['Description'])
+    return data
     #Hardcoded for now
 
-    data = {}
-    data.setdefault('Name',"Placeholder name")
-    data.setdefault('Description',"This is a random line of text that should be replaced with real data before the assignment is handed in")
-    return data
+    #data = {}
+    #data.setdefault('Name',"Placeholder name")
+    #data.setdefault('Description',"This is a random line of text that should be replaced with real data before the assignment is handed in")
+    #return data
 
 #print(platform.system())
 #returns tuple of keys and name of problem
