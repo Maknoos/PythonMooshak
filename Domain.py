@@ -136,6 +136,7 @@ def initProblemDicts(dict):
     dict['Language'] = {}
 
 def getNameAndDescription(ID):
+    init()
     data = {}
     data.setdefault('Name',answerDict[ID]['Name'])
     data.setdefault('Description',answerDict[ID]['Description'])
@@ -152,7 +153,6 @@ def getNameAndDescription(ID):
 def getDictKeysAndName():
     init()
     return [(x , answerDict[x]['Name']) for x in answerDict] #needs to be sorted by keys..
-    #return[(1,"Palindromes"),(2,"Ants & Bugs"),(3,"stringcalculator"),(10,"samlagning"),(20,"deiling"),(21,"stringProcessing")]
 
 def initTestData():
     createProblem("Is Palindrome", "..", "./correctIsPalindrome.cpp", ['tacocat', 'not','aaaaa'])
@@ -223,7 +223,6 @@ def compileC(inputFile):
 
 
 def maggi():
-    #pass
     init()
     print(testFile("0","./correctIsPalindrome.cpp"))
     pass
