@@ -12,17 +12,14 @@
 </div>
 <!-- /.row -->
 
-
 {% for pid,name in problems %}
-<!-- Project One -->
 <div class="row">
     <div class="col-md-5">
-        <h3>Problem {{pid}}</h3>
+        <h3>Problem {{loop.index}}</h3>
         <h4>{{name}}</h4>
         <a class="btn btn-primary" href="/handin/{{pid}}">View Problem<span class="glyphicon glyphicon-chevron-right"></span></a>
     </div>
 </div>
-<!-- /.row -->
 {% endfor %}
 
 <hr>

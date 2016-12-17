@@ -58,7 +58,7 @@ def upload():
             testC = testC.replace('\n', '')
             testC = Markup(testC)
 
-        return render_template("complete.html", answer = ans, testCases = testC)
+        return render_template("answer.html", answer = ans, testCases = testC)
 
 if __name__ == "__main__":
     app.run()
