@@ -17,7 +17,12 @@ def allowed_file(filename):
 @app.route("/")
 def index():
     problems = getDictKeysAndName()
+    problems = sorted(problems, key= lambda x : int(x[0]))
     return render_template('index.html', problems=problems)
+
+@app.route("/createProblem")
+def createProblem():
+    return render_template('createProblem.html')
 
 @app.route("/handin/<pid>")
 def handin(pid):
