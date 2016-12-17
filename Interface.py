@@ -17,7 +17,12 @@ def allowed_file(filename):
 @app.route("/")
 def index():
     problems = getDictKeysAndName()
+    problems = sorted(problems, key= lambda x : int(x[0]))
     return render_template('index.html', problems=problems)
+
+@app.route("/createProblem")
+def createProblem():
+    return render_template('createProblem.html')
 
 @app.route("/handin/<pid>")
 def handin(pid):
@@ -51,8 +56,16 @@ def upload():
         # senda a domain og fa nidurstodur tilbaka
         ans, testC = testFile(pid, destination)
 
+        if ans == 'Accepted':
+            return render_template("answer.html", answer=ans)
+
         for i in testC:
             testC = i
+
+        if ans == 'Memory error':
+            testC = testC.replace('\n', '<br/>')
+            testC = Markup('<p>' + testC + '</p>')
+            return render_template("answer.html", answer=ans, testCases=testC)
 
         if testC:
             testC = testC.replace('\n', '')
