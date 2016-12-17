@@ -89,6 +89,7 @@ def testFile(problemID, inputFile):
     feedBack = []
     answers = answerDict[problemID]['Answers']
     timeout = answerDict[problemID]['Timeout']
+    checkMemory = answerDict[problemID]['Valgrind']
     try:
         compileCPlus(inputFile)
     except compileTimeException as compileError:
@@ -97,8 +98,12 @@ def testFile(problemID, inputFile):
         feedBack = runCPlus(answers,inputFile,timeout)
     except TimeoutExpired:
         return("Time limit exceeded",[])
-    if len(feedBack)!=0:
+    if len(feedBack)!=0: #gera hjalparfall
         result = "Wrong Answer"
+    elif checkMemory:
+        feedBack = valgrindCheck(inputFile)
+        if len(feedBack) != 0:  #gera hjalparfall
+            result = "Memory error"
     else:
         result = "Accepted"
     removeFile(inputFile)
@@ -218,8 +223,9 @@ def compileC(inputFile):
 
 
 def maggi():
-    pass
+    #pass
     init()
+    print(testFile("0","./correctIsPalindrome.cpp"))
     pass
     #compileCPlus("./test.cpp")
     #compileC("gylfi.c")
