@@ -3,6 +3,7 @@ import platform
 import re
 import os
 import difflib
+import json
 from subprocess import TimeoutExpired #for some reason this isn't included when importing subprocess
 
 class compileTimeException(Exception):
@@ -33,7 +34,7 @@ def runCPlus(pairs,inputFile):
         except TimeoutExpired:
             compilationProcess.kill()
             raise
-        result = compare(output,pair[1]) #HARDCODED ANSWER FILE for now, should be determined by which assignment user is handing it
+        result = compare(output,pair[1])
 
         if result != "":
             differences.append(result)
@@ -60,7 +61,7 @@ def removeFile(inputFile):
     os.remove(inputFileToExe(inputFile))
 
 def inputFileToExe(inputFile):
-    if ".cpp" in inputFile:
+    if ".cpp" in inputFile: #hvað ef hún heitir asshole.cpp.c?
         return re.sub(".cpp$",".exe",inputFile)
     else:
         return re.sub(".c$", ".exe", inputFile)
@@ -79,6 +80,7 @@ def compare(obtained,expected):
         #difference = difflib.HtmlDiff().make_file(obtained.splitlines(), expected.splitlines())
 
         #difference = '\n'.join(difflib.Differ().compare(obtained.splitlines(), expected.splitlines()))
+        #print(difference)
         return difference
 
 def testFile(problemID, inputFile):
@@ -113,6 +115,7 @@ def createProblem(problemName, problemDescription, inputFile, testCases, valgrin
     answerDict[ID]['Answers'] = generateAnswers(inputFile,testCases)
     answerDict[ID]['Timeout'] = timeout
     answerDict[ID]['Valgrind'] = valgrind
+    answerDict[ID]['Language'] = re.search('\.[^.]*$',inputFile).group()
     removeFile(inputFile)
 
 
@@ -122,6 +125,7 @@ def initProblemDicts(dict):
     dict['Answers'] = {}
     dict['Timeout'] = {}
     dict['Valgrind'] = {}
+    dict['Language'] = {}
 
 def getNameAndDescription(ID):
     #data = {}
@@ -138,7 +142,7 @@ def getNameAndDescription(ID):
 #print(platform.system())
 #returns tuple of keys and name of problem
 def getDictKeysAndName():
-    #return [(x , answerDict[x]['Name']) for x in answerDict]
+    #return [(x , answerDict[x]['Name']) for x in answerDict] #needs to be sorted by keys..
     return[(1,"Palindromes"),(2,"Ants & Bugs"),(3,"stringcalculator"),(10,"samlagning"),(20,"deiling"),(21,"stringProcessing")]
 
 def initTestData():
@@ -146,23 +150,38 @@ def initTestData():
     createProblem("Pogba Goal", "..", "./correctPogba.cpp", ['x', 'k'])
     createProblem("Only Digits", "..", "./correctOnlyDigits.cpp", ['18534', 'asdfd', '1?#3'])
 
-
+def init():
+    global answerDict
+    with open('AnswerDictionary.json', 'r') as f:
+        answerDict = json.load(f)
+def exitAndSave():
+    with open('AnswerDictionary.json', 'w') as f:
+        json.dump(answerDict, f)
 def KG():
-    InputFile = "./test.cpp"
+
+    #InputFile = "./leak.cpp"
+
+    #InputFile = "./test.cpp"
+
     #InputFile = "./forever.cpp"
     #InputFile = "./wrongIsPalindrome.cpp"
-    #InputFile = "./correctIsPalindrome.cpp"
+    InputFile = "./correctIsPalindrome.cpp"
 
     #create problem
     #initTestData()
-    # test problem with id
-    #problemID = getDictKeysAndName()[0][0]  # hardcoded to test
-    #print (testFile(problemID, InputFile)[0])
 
+    init()
+    print("hi")
+
+    # test problem with id
+    problemID = getDictKeysAndName()[0][0]  # hardcoded to test
+    print(answerDict)
 
 
     compileCPlus(InputFile)
-    print (valgrindCheck(InputFile))
+    print (testFile('0', InputFile)[0])
+    exitAndSave()
+    #print (valgrindCheck(InputFile))
     #runCPlus(answerDict[problemID]['Answers'], InputFile)
     #removeFile(InputFile)
 
@@ -196,6 +215,8 @@ def compileC(inputFile):
 
 def maggi():
     pass
+    init()
+    pass
     #compileCPlus("./test.cpp")
     #compileC("gylfi.c")
     #pairs = [("a", "a\n"), ("b", "HelloWorld"), ("c", "n")]
@@ -210,7 +231,7 @@ def maggi():
     #success = valgrindCheck("./noerrors.cpp")
     #print("success"+success+"success")
     #print("fail"+fail+"fail")
-#maggi()
+maggi()
 
 
 #KG()
