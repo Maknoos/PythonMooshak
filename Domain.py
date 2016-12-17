@@ -203,7 +203,7 @@ def valgrindCheck(inputFile):
     output = memoryProcess.communicate()[1].decode()
 
     if hasErrors(output):
-        return output
+        return [output]
     else:
         return ""
 
