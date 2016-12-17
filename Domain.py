@@ -215,6 +215,8 @@ def compileC(inputFile):
 
 def maggi():
     pass
+    init()
+    pass
     #compileCPlus("./test.cpp")
     #compileC("gylfi.c")
     #pairs = [("a", "a\n"), ("b", "HelloWorld"), ("c", "n")]
@@ -229,7 +231,7 @@ def maggi():
     #success = valgrindCheck("./noerrors.cpp")
     #print("success"+success+"success")
     #print("fail"+fail+"fail")
-#maggi()
+maggi()
 
 
-KG()
+#KG()
