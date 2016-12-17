@@ -90,8 +90,12 @@ def testFile(problemID, inputFile):
     answers = answerDict[problemID]['Answers']
     timeout = answerDict[problemID]['Timeout']
     checkMemory = answerDict[problemID]['Valgrind']
+    language  = answerDict[problemID]['Language']
     try:
-        compileCPlus(inputFile)
+        if language == ".cpp": #sameina i fall med language sem parameter
+            compileCPlus(inputFile)
+        else:
+            compileC(inputFile)
     except compileTimeException as compileError:
         return "Compile Time error" , [str(compileError)]
     try:
@@ -112,7 +116,7 @@ def testFile(problemID, inputFile):
 #print (compileCPlus())
 
 #we dont save the inputFile for now.. just answers and id of the problem
-def createProblem(problemName, problemDescription, inputFile, testCases, valgrind = False, timeout = 0):
+def createProblem(problemName, problemDescription, inputFile, testCases, valgrind = False, timeout = 10):
 
     ID = len(answerDict.keys())
     answerDict[ID] = {}
@@ -224,7 +228,7 @@ def compileC(inputFile):
 
 def maggi():
     init()
-    print(testFile("0","./correctIsPalindrome.cpp"))
+    print(testFile("0","./gylfi.c"))
     pass
     #compileCPlus("./test.cpp")
     #compileC("gylfi.c")
