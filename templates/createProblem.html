@@ -2,10 +2,10 @@
 
 {% block body %}
 
-<form>
+<form action="{{ url_for('createProblemPost') }}" method="post">
   <div class="form-group">
     <label for="problemName">Problem name</label>
-    <input type="text" class="form-control" id="problemName" placeholder="Enter name">
+    <input type="text" class="form-control" id="problemName" name="problemName"placeholder="Enter name">
   </div>
   <div class="form-group">
     <label for="description">Problem Description</label>

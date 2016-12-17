@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, Markup
+from flask import Flask, render_template, request, redirect, Markup, url_for
 from werkzeug.utils import secure_filename
 from Domain import testFile, getDictKeysAndName, getNameAndDescription
 
@@ -23,6 +23,12 @@ def index():
 @app.route("/createProblem")
 def createProblem():
     return render_template('createProblem.html')
+
+@app.route("/createProblem", methods=['POST'])
+def createProblemPost():
+    name = request.form['problemName']
+
+    return redirect(url_for('index'))
 
 @app.route("/handin/<pid>")
 def handin(pid):
