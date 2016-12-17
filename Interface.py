@@ -51,8 +51,16 @@ def upload():
         # senda a domain og fa nidurstodur tilbaka
         ans, testC = testFile(pid, destination)
 
+        if ans == 'Accepted':
+            return render_template("answer.html", answer=ans)
+
         for i in testC:
             testC = i
+
+        if ans == 'Memory error':
+            testC = testC.replace('\n', '<br/>')
+            testC = Markup('<p>' + testC + '</p>')
+            return render_template("answer.html", answer=ans, testCases=testC)
 
         if testC:
             testC = testC.replace('\n', '')
