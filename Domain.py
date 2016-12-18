@@ -9,9 +9,10 @@ from subprocess import TimeoutExpired  # for some reason this isn't included whe
 class compileTimeException(Exception):
     pass
 
-#Main data structure used to store problems on runtime
+# Main data structure used to store problems on runtime
 answerDict = {}
 
+# Runs a list of inputs through a file and returns the differences in outputs as a html table
 def runInputFile(pairs, inputFile, timeLimit):
     differences = []
     runString = inputFileToExe(inputFile)
@@ -30,9 +31,9 @@ def runInputFile(pairs, inputFile, timeLimit):
 
     return differences
 
-#We take in the 'Answer' file and the inputs to run tests with
-#we compile and run the answer file with the inputs and generate tuples of
-#input to output pairings which we later use to compare
+# We take in the 'Answer' file and the inputs to run tests with
+# we compile and run the answer file with the inputs and generate tuples of
+# input to output pairings which we later use to compare
 def generateAnswers(inputFile, input,language):
     answers = []
     compile(inputFile,getFileLanguage(inputFile))
@@ -44,21 +45,21 @@ def generateAnswers(inputFile, input,language):
         answers.append((inp, output))
     return answers
 
-#Clean up function that removes files we are done with(.exe mostly)
-#Python files are also removed but this is arguable
+# Clean up function that removes files we are done with(.exe mostly)
+# Python files are also removed but this is arguable
 def removeFile(inputFile):
     if inputFile.endswith('.py'):
         os.remove(inputFile)
         return
     else:
         os.remove(inputFileToExe(inputFile))
-#Get which programming language a file is written in
+# Get which programming language a file is written in
 def getFileLanguage(inputFile):
     return re.search('\.[^.]*$', inputFile).group()
 
 
-#Simple function that changes the file extensions of .cpp and .c to .exe files
-#both for clean up purposes and also for simpler "run" code
+# Simple function that changes the file extensions of .cpp and .c to .exe files
+# both for clean up purposes and also for simpler "run" code
 def inputFileToExe(inputFile):
     if inputFile.endswith(".cpp"):
         return re.sub(".cpp$", ".exe", inputFile)
@@ -69,8 +70,8 @@ def inputFileToExe(inputFile):
     else:
         return None
 
-#takes in the output from the compiled program and compares it to a file with correct output
-#returns a html table that we render that diplays the differences
+# takes in the output from the compiled program and compares it to a file with correct output
+# returns a html table that we render that displays the differences
 def compare(obtained, expected):
     if(obtained == expected):
         return ""
@@ -78,6 +79,8 @@ def compare(obtained, expected):
         difference = difflib.HtmlDiff().make_table(obtained.splitlines(), expected.splitlines())
         return difference
 
+# The main function in the Domain script , takes a code file compiles it, runs it and performs
+# all the necessary checks,
 def testFile(problemID, inputFile):
     updateData()
     result = ""
@@ -106,13 +109,14 @@ def testFile(problemID, inputFile):
     removeFile(inputFile)
     return result, feedBack
 
-#Simple wrapping function for removing a file when we hit an exception to avoid repeated code
+# Simple wrapping function for removing a file when we hit an exception to avoid repeated code
 def errorHandle(tuple, file):
     removeFile(file)
     return tuple
-#This function creates a "problem". The file from the user is compiled & run with the given test cases and
-#the results  are stored with the input as tuples. after running the .exe file is deleted. User can choose
-#whether they want valgrind to be used or even how long for timeout.
+
+# This function creates a "problem". The file from the user is compiled & run with the given test cases and
+# the results  are stored with the input as tuples. after running the .exe file is deleted. User can choose
+# whether they want valgrind to be used or even how long for timeout.
 def addProblem(problemName, problemDescription, inputFile, testCases, language, valgrind = False, timeout = 10):
 
     ID = len(answerDict.keys())
@@ -128,7 +132,7 @@ def addProblem(problemName, problemDescription, inputFile, testCases, language, 
     removeFile(inputFile)
     saveToFile()
 
-#Initialize the dictionary with more dictionaries
+# Initialize the dictionary with more dictionaries
 def initProblemDicts(dict):
     dict['Name'] = {}
     dict['Description'] = {}
@@ -137,6 +141,8 @@ def initProblemDicts(dict):
     dict['Valgrind'] = {}
     dict['Language'] = {}
 
+# A function that returns a dictionary containing the name , description and the language
+# for a specific problem
 def getNameDescAndLang(ID):
     updateData()
     data = {}
@@ -145,21 +151,23 @@ def getNameDescAndLang(ID):
     data.setdefault('Language', answerDict[ID]['Language'])
     return data
 
-#returns tuple of keys and name of problem
+# returns tuple of keys and name of problem
 def getDictKeysAndName():
     updateData()
     return [(x, answerDict[x]['Name']) for x in answerDict]
 
-#Fill dictionary with data(problems) from the .json file
+# Fill dictionary with data(problems) from the .json file
 def updateData():
     global answerDict
     with open('AnswerDictionary.json', 'r') as f:
         answerDict = json.load(f)
-#Saves the dictionary into a .json file
+
+# Saves the dictionary into a .json file
 def saveToFile():
     with open('AnswerDictionary.json', 'w') as f:
         json.dump(answerDict, f)
 
+# Runs Valgrind on the program  and returns the valgrind message if the program has memory leaks
 def valgrindCheck(inputFile):
     inputFile = inputFileToExe(inputFile)
     if ".py" in inputFile:
@@ -172,16 +180,18 @@ def valgrindCheck(inputFile):
     else:
         return ""
 
+#  returns true if a valgrind message has more than 0 errors
 def hasErrors(output):
     lines = output.splitlines()
     errorcount = lines[-1].split(":")[1]
     return (not "0" in errorcount)
 
+# compiles c/c++ code by running the gcc/g++ compiler in the command line using subprocess
 def compile(inputFile,language):
     exeFile = inputFileToExe(inputFile)
     if language == ".cpp":
         compiler = r"/usr/bin/g++"
-    elif language == ".py": # doesnt need compiling
+    elif language == ".py": # doesn't need compiling
         return
     else:
         compiler = r"/usr/bin/gcc"
