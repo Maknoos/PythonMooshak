@@ -6,12 +6,13 @@ import difflib
 import json
 from subprocess import TimeoutExpired # for some reason this isn't included when importing subprocess
 
+
 class compileTimeException(Exception):
     pass
 
 answerDict = {}
 
-def runCPlus(pairs,inputFile,timeLimit):
+def runInputFile(pairs, inputFile, timeLimit):
     #runString = "./" + inputFileToExe(inpuls
     # tFile)
     differences = []
@@ -34,25 +35,32 @@ def runCPlus(pairs,inputFile,timeLimit):
 #input is list of strings to test
 def generateAnswers(inputFile, input,language):
     answers = []
-    compile(inputFile,language)
+    #compileCPlus(inputFile)
+    compile(inputFile,getFileLanguage(inputFile))
+    #compile(inputFile,language)
+
     runString = inputFileToExe(inputFile)
     for inp in input:
+        #TODO try catch
         compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
-        #currInput = inp.encode()
-        try:
-            output = compilationProcess.communicate(input=inp.encode(), timeout=5)[0].decode()
-            answers.append((inp,output))
-        except TimeoutExpired:
-            compilationProcess.kill()
-            raise Exception
+        output = compilationProcess.communicate(input=inp.encode(), timeout=5)[0].decode()
+        answers.append((inp,output))
     return answers
 
 def removeFile(inputFile):
-    os.remove(inputFileToExe(inputFile))
+    if inputFile.endswith('.py'):
+        os.remove(inputFile)
+        return
+    else:
+        os.remove(inputFileToExe(inputFile))
+def getFileLanguage(inputFile):
+    return re.search('\.[^.]*$',inputFile).group()
 
 def inputFileToExe(inputFile):
     if ".cpp" in inputFile: #hvað ef hún heitir asshole.cpp.c?
         return re.sub(".cpp$",".exe",inputFile)
+    elif inputFile.endswith(".py"): #py scripts dont run as exe
+        return ["python3", inputFile]
     else:
         return re.sub(".c$", ".exe", inputFile)
     #ATH skrifa sem snyrtilegri lausn
@@ -86,10 +94,10 @@ def testFile(problemID, inputFile):
     except compileTimeException as compileError:
         return "Compile Time error" , [str(compileError)]
     try:
-        feedBack = runCPlus(answers,inputFile,timeout)
+        feedBack = runInputFile(answers, inputFile, timeout)
     except TimeoutExpired:
-        removeFile(inputFile) #ath 2x kallad a , gera yfirfall
-        return("Time limit exceeded",[])
+        return(("Time limit exceeded",[]), inputFile)
+
     if len(feedBack)!=0: #gera hjalparfall
         result = "Wrong Answer"
     elif checkMemory:
@@ -100,7 +108,9 @@ def testFile(problemID, inputFile):
         result = "Accepted"
     removeFile(inputFile)
     return result, feedBack
-
+def errorHandle(tuple, file):
+    removeFile(file)
+    return tuple
 #we dont save the inputFile for now.. just answers and id of the problem
 def addProblem(problemName, problemDescription, inputFile, testCases, language, valgrind = False, timeout = 10):
 
@@ -140,9 +150,10 @@ def getDictKeysAndName():
     return [(x , answerDict[x]['Name']) for x in answerDict] #needs to be sorted by keys..
 
 def initTestData():
-    addProblem("Is Palindrome", "..", "./correctIsPalindrome.cpp", ['tacocat', 'not','aaaaa'])
-    addProblem("Pogba Goal", "..", "./correctPogba.cpp", ['x', 'k'])
-    addProblem("Only Digits", "..", "./correctOnlyDigits.cpp", ['18534', 'asdfd', '1?#3'])
+    addProblem("Is Palindrome", "..", "./correctIsPalindrome.cpp", ['tacocat', 'not','aaaaa'],'.cpp')
+    addProblem("Pogba Goal", "..", "./correctPogba.cpp", ['x', 'k'],'.cpp')
+    addProblem("Only Digits", "..", "./correctOnlyDigits.cpp", ['18534', 'asdfd', '1?#3'],'.cpp')
+    addProblem("testPython", "..", "./testPY.py", ['', '',''],'.py')
 
 def init():
     global answerDict
@@ -151,35 +162,6 @@ def init():
 def saveToFile():
     with open('AnswerDictionary.json', 'w') as f:
         json.dump(answerDict, f)
-def KG():
-
-    #InputFile = "./leak.cpp"
-
-    #InputFile = "./test.cpp"
-
-    #InputFile = "./forever.cpp"
-    #InputFile = "./wrongIsPalindrome.cpp"
-    InputFile = "./correctIsPalindrome.cpp"
-
-    #create problem
-    #initTestData()
-
-    init()
-    print("hi")
-
-    # test problem with id
-    problemID = getDictKeysAndName()[0][0]  # hardcoded to test
-    print(answerDict)
-
-
-    compileCPlus(InputFile)
-    print (testFile('0', InputFile)[0])
-    exitAndSave()
-    #print (valgrindCheck(InputFile))
-    #runCPlus(answerDict[problemID]['Answers'], InputFile)
-    #removeFile(InputFile)
-
-
 
 def valgrindCheck(inputFile):
     #ATH ./
@@ -201,6 +183,8 @@ def compile(inputFile,language):
     exeFile = inputFileToExe(inputFile)
     if language == ".cpp":
         compiler = r"/usr/bin/g++"
+    elif language == ".py": #doesnt need compiling, although what about build errors?
+        return
     else:
         compiler = r"/usr/bin/gcc"
     compilationProcess = subprocess.Popen([compiler, inputFile, "-o", exeFile], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
@@ -216,4 +200,3 @@ def maggi():
 #maggi()
 
 
-#KG()
