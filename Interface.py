@@ -10,10 +10,12 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# Checks if file name has ALLOWED_EXTENSIONS. Returns True if so, otherwise False
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
+# Front page. Displays all problems.
 @app.route("/")
 def index():
     problems = getDictKeysAndName()
@@ -24,6 +26,7 @@ def index():
 def createProblem():
     return render_template('createProblem.html')
 
+# Creates new problem. Uploaded file is compiled and output is generated based on input.
 @app.route("/createProblem", methods=['POST'])
 def createProblemPost():
     name = request.form['problemName']
@@ -63,11 +66,13 @@ def createProblemPost():
 
     return redirect(url_for('index'))
 
+# Displays information about specific problem.
 @app.route("/handin/<pid>")
 def handin(pid):
     result = getNameDescAndLang(pid)
     return render_template('handin.html', pid=pid, result=result)
 
+# Uploads file from user and displays the result
 @app.route('/upload', methods=['POST'])
 def upload():
     target = os.path.join(app.config['UPLOAD_FOLDER'], 'uploads')
