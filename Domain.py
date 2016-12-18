@@ -12,7 +12,7 @@ class compileTimeException(Exception):
 
 answerDict = {}
 
-def runCPlus(pairs,inputFile,timeLimit):
+def runInputFile(pairs, inputFile, timeLimit):
     #runString = "./" + inputFileToExe(inpuls
     # tFile)
     differences = []
@@ -41,14 +41,10 @@ def generateAnswers(inputFile, input,language):
 
     runString = inputFileToExe(inputFile)
     for inp in input:
+        #TODO try catch
         compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
-        #currInput = inp.encode()
-        try:
-            output = compilationProcess.communicate(input=inp.encode(), timeout=5)[0].decode()
-            answers.append((inp,output))
-        except TimeoutExpired:
-            compilationProcess.kill()
-            raise Exception
+        output = compilationProcess.communicate(input=inp.encode(), timeout=5)[0].decode()
+        answers.append((inp,output))
     return answers
 
 def removeFile(inputFile):
@@ -64,7 +60,7 @@ def inputFileToExe(inputFile):
     if ".cpp" in inputFile: #hvað ef hún heitir asshole.cpp.c?
         return re.sub(".cpp$",".exe",inputFile)
     elif inputFile.endswith(".py"): #py scripts dont run as exe
-        return ["python", inputFile]
+        return ["python3", inputFile]
     else:
         return re.sub(".c$", ".exe", inputFile)
     #ATH skrifa sem snyrtilegri lausn
@@ -98,10 +94,10 @@ def testFile(problemID, inputFile):
     except compileTimeException as compileError:
         return "Compile Time error" , [str(compileError)]
     try:
-        feedBack = runCPlus(answers,inputFile,timeout)
+        feedBack = runInputFile(answers, inputFile, timeout)
     except TimeoutExpired:
-        removeFile(inputFile) #ath 2x kallad a , gera yfirfall
-        return("Time limit exceeded",[])
+        return(("Time limit exceeded",[]), inputFile)
+
     if len(feedBack)!=0: #gera hjalparfall
         result = "Wrong Answer"
     elif checkMemory:
@@ -112,7 +108,9 @@ def testFile(problemID, inputFile):
         result = "Accepted"
     removeFile(inputFile)
     return result, feedBack
-
+def errorHandle(tuple, file):
+    removeFile(file)
+    return tuple
 #we dont save the inputFile for now.. just answers and id of the problem
 def addProblem(problemName, problemDescription, inputFile, testCases, language, valgrind = False, timeout = 10):
 
@@ -163,50 +161,6 @@ def init():
 def saveToFile():
     with open('AnswerDictionary.json', 'w') as f:
         json.dump(answerDict, f)
-def testRunPY(path):
-    #output = compilationProcess.communicate(input=inp.encode(), timeout=5)[0].decode()
-
-    compilationProcess = subprocess.Popen(["python", path], stdout=subprocess.PIPE, stdin=subprocess.PIPE,stderr=subprocess.PIPE)
-    status = compilationProcess.communicate()
-    output = status[0].decode()
-    error = status[1].decode()
-    if error != "":
-        raise compileTimeException(error)
-   # output = status[0].decode()
-    print(output)
-    #print(out)
-
-def KG():
-    #print('fuck')
-    #testRunPY('testPY.py')
-    #InputFile = "./leak.cpp"
-    InputFile = "testPy.py"
-    #InputFile = "./test.cpp"
-
-    #InputFile = "./forever.cpp"
-    #InputFile = "./wrongIsPalindrome.cpp"
-    #InputFile = "./correctIsPalindrome.cpp"
-
-    #create problem
-    #initTestData()
-
-
-    init()
-    #print("hi")
-
-    # test problem with id
-    #problemID = getDictKeysAndName()[3][0]  # hardcoded to test
-    print(answerDict)
-    problemID = '3'
-    print (testFile(problemID, InputFile))
-    #compileCPlus(InputFile)
-    #print (testFile('0', InputFile)[0])
-    saveToFile()
-    #print (valgrindCheck(InputFile))
-    #runCPlus(answerDict[problemID]['Answers'], InputFile)
-    #removeFile(InputFile)
-
-
 
 def valgrindCheck(inputFile):
     #ATH ./
@@ -246,4 +200,5 @@ def maggi():
 #maggi()
 
 
-KG()
+#KG()
+
