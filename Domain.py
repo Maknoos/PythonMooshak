@@ -38,7 +38,7 @@ def generateAnswers(inputFile, input,language):
     for inp in input:
         compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
         output = compilationProcess.communicate(input=inp.encode(), timeout=5)[0].decode()
-        answers.append((inp,output))
+        answers.append((inp, output))
     return answers
 
 def removeFile(inputFile):
@@ -48,11 +48,11 @@ def removeFile(inputFile):
     else:
         os.remove(inputFileToExe(inputFile))
 def getFileLanguage(inputFile):
-    return re.search('\.[^.]*$',inputFile).group()
+    return re.search('\.[^.]*$', inputFile).group()
 
 def inputFileToExe(inputFile):
     if inputFile.endswith(".cpp"):
-        return re.sub(".cpp$",".exe",inputFile)
+        return re.sub(".cpp$", ".exe", inputFile)
     elif inputFile.endswith(".py"): #py scripts dont run as exe
         return ["python3", inputFile]
     elif inputFile.endswith(".c"):
@@ -61,7 +61,7 @@ def inputFileToExe(inputFile):
         return None
 
 #takes in the output from the compiled program and compares it to a file with correct output
-def compare(obtained,expected):
+def compare(obtained, expected):
     if(obtained == expected):
         return ""
     else:
@@ -74,15 +74,15 @@ def testFile(problemID, inputFile):
     answers = answerDict[problemID]['Answers']
     timeout = answerDict[problemID]['Timeout']
     checkMemory = answerDict[problemID]['Valgrind']
-    language  = answerDict[problemID]['Language']
+    language = answerDict[problemID]['Language']
     try:
-       compile(inputFile,language)
+       compile(inputFile, language)
     except compileTimeException as compileError:
-        return errorHandle(("Compile Time error" , [str(compileError)]),inputFile)
+        return errorHandle(("Compile Time error", [str(compileError)]),inputFile)
     try:
         feedBack = runInputFile(answers, inputFile, timeout)
     except TimeoutExpired:
-        return errorHandle(("Time limit exceeded",[]), inputFile)
+        return errorHandle(("Time limit exceeded", []), inputFile)
 
     if len(feedBack)!=0:
         result = "Wrong Answer"
@@ -107,7 +107,7 @@ def addProblem(problemName, problemDescription, inputFile, testCases, language, 
 
     answerDict[ID]['Name'] = problemName
     answerDict[ID]['Description'] = problemDescription
-    answerDict[ID]['Answers'] = generateAnswers(inputFile,testCases,language)
+    answerDict[ID]['Answers'] = generateAnswers(inputFile, testCases, language)
     answerDict[ID]['Timeout'] = int(timeout)
     answerDict[ID]['Valgrind'] = valgrind
     answerDict[ID]['Language'] = language
@@ -125,15 +125,15 @@ def initProblemDicts(dict):
 def getNameDescAndLang(ID):
     updateData()
     data = {}
-    data.setdefault('Name',answerDict[ID]['Name'])
-    data.setdefault('Description',answerDict[ID]['Description'])
-    data.setdefault('Language',answerDict[ID]['Language'])
+    data.setdefault('Name', answerDict[ID]['Name'])
+    data.setdefault('Description', answerDict[ID]['Description'])
+    data.setdefault('Language', answerDict[ID]['Language'])
     return data
 
 #returns tuple of keys and name of problem
 def getDictKeysAndName():
     updateData()
-    return [(x , answerDict[x]['Name']) for x in answerDict]
+    return [(x, answerDict[x]['Name']) for x in answerDict]
 
 def updateData():
     global answerDict
@@ -144,11 +144,10 @@ def saveToFile():
         json.dump(answerDict, f)
 
 def valgrindCheck(inputFile):
-    #ATH ./
     inputFile = inputFileToExe(inputFile)
     if ".py" in inputFile:
         return ""
-    memoryProcess = subprocess.Popen(["valgrind","--leak-check=yes",inputFile],stdin=subprocess.PIPE,stderr=subprocess.PIPE)
+    memoryProcess = subprocess.Popen(["valgrind","--leak-check=yes",inputFile], stdin=subprocess.PIPE, stderr=subprocess.PIPE)
     output = memoryProcess.communicate()[1].decode()
 
     if hasErrors(output):
@@ -159,13 +158,13 @@ def valgrindCheck(inputFile):
 def hasErrors(output):
     lines = output.splitlines()
     errorcount = lines[-1].split(":")[1]
-    return(not "0" in errorcount)
+    return (not "0" in errorcount)
 
 def compile(inputFile,language):
     exeFile = inputFileToExe(inputFile)
     if language == ".cpp":
         compiler = r"/usr/bin/g++"
-    elif language == ".py": #doesnt need compiling, although what about build errors?
+    elif language == ".py": # doesnt need compiling
         return
     else:
         compiler = r"/usr/bin/gcc"
