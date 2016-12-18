@@ -1,7 +1,8 @@
 import os
 from flask import Flask, render_template, request, redirect, Markup, url_for
 from werkzeug.utils import secure_filename
-from Domain import testFile, getDictKeysAndName, getNameAndDescription, createProblem
+from Domain import testFile, getDictKeysAndName, getNameAndDescription, addProblem
+import json
 
 UPLOAD_FOLDER = os.path.dirname(os.path.abspath(__file__))
 ALLOWED_EXTENSIONS = set(['cpp', 'c'])          # haegt ad setja fleiri endingar
@@ -31,7 +32,12 @@ def createProblemPost():
     input = request.form['input']
     language = request.form['language']             # tharf ad utfaera eitthvad fyrir language
     timeOut = request.form['timeOut']               # haegt ad tjekka lika a endingu a faelnum
-    valgrind = request.form['ValgrindOption']
+
+    if request.form['ValgrindOption'] == 'False':
+        valgrind = False
+    else:
+        valgrind = True
+
     file = request.files['file']
 
     target = os.path.join(app.config['UPLOAD_FOLDER'], 'uploads')
@@ -47,9 +53,7 @@ def createProblemPost():
     for i in input.splitlines():
         testCases.append(i)
 
-    # createProblem(problemName, problemDescription, inputFile, testCases, valgrind = False, timeout = 10):
-    # createProblem(name, description, destination, testCases, valgrind, timeOut)
-
+    addProblem(name, description, destination, testCases, language, valgrind, timeOut)
 
     return redirect(url_for('index'))
 
