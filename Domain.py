@@ -102,7 +102,7 @@ def testFile(problemID, inputFile):
     return result, feedBack
 
 #we dont save the inputFile for now.. just answers and id of the problem
-def createProblem(problemName, problemDescription, inputFile, testCases, language, valgrind = False, timeout = 10):
+def addProblem(problemName, problemDescription, inputFile, testCases, language, valgrind = False, timeout = 10):
 
     ID = len(answerDict.keys())
     answerDict[ID] = {}
@@ -115,6 +115,7 @@ def createProblem(problemName, problemDescription, inputFile, testCases, languag
     answerDict[ID]['Valgrind'] = valgrind
     answerDict[ID]['Language'] = language
     removeFile(inputFile)
+    saveToFile()
 
 
 def initProblemDicts(dict):
@@ -139,15 +140,15 @@ def getDictKeysAndName():
     return [(x , answerDict[x]['Name']) for x in answerDict] #needs to be sorted by keys..
 
 def initTestData():
-    createProblem("Is Palindrome", "..", "./correctIsPalindrome.cpp", ['tacocat', 'not','aaaaa'])
-    createProblem("Pogba Goal", "..", "./correctPogba.cpp", ['x', 'k'])
-    createProblem("Only Digits", "..", "./correctOnlyDigits.cpp", ['18534', 'asdfd', '1?#3'])
+    addProblem("Is Palindrome", "..", "./correctIsPalindrome.cpp", ['tacocat', 'not','aaaaa'])
+    addProblem("Pogba Goal", "..", "./correctPogba.cpp", ['x', 'k'])
+    addProblem("Only Digits", "..", "./correctOnlyDigits.cpp", ['18534', 'asdfd', '1?#3'])
 
 def init():
     global answerDict
     with open('AnswerDictionary.json', 'r') as f:
         answerDict = json.load(f)
-def exitAndSave():
+def saveToFile():
     with open('AnswerDictionary.json', 'w') as f:
         json.dump(answerDict, f)
 def KG():
