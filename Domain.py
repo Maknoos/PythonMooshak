@@ -35,13 +35,10 @@ def runInputFile(pairs, inputFile, timeLimit):
 #input is list of strings to test
 def generateAnswers(inputFile, input,language):
     answers = []
-    #compileCPlus(inputFile)
     compile(inputFile,getFileLanguage(inputFile))
-    #compile(inputFile,language)
 
     runString = inputFileToExe(inputFile)
     for inp in input:
-        #TODO try catch
         compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
         output = compilationProcess.communicate(input=inp.encode(), timeout=5)[0].decode()
         answers.append((inp,output))
@@ -143,7 +140,6 @@ def getNameDescAndLang(ID):
     data.setdefault('Language',answerDict[ID]['Language'])
     return data
 
-#print(platform.system())
 #returns tuple of keys and name of problem
 def getDictKeysAndName():
     updateData()
