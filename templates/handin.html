@@ -1,8 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
 
-<h1>Problem {{pid}}</h1>
-<h2>{{result['Name']}}</h2>
+<h1>{{result['Name']}}</h1>
 <p>{{result['Description']}}</p>
 <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
     <div>
