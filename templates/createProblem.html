@@ -2,24 +2,24 @@
 
 {% block body %}
 
-<form>
+<form action="{{ url_for('createProblemPost') }}" method="post" enctype="multipart/form-data">
   <div class="form-group">
     <label for="problemName">Problem name</label>
-    <input type="text" class="form-control" id="problemName" placeholder="Enter name">
+    <input type="text" class="form-control" id="problemName" name="problemName"placeholder="Enter name">
   </div>
   <div class="form-group">
     <label for="description">Problem Description</label>
-    <textarea class="form-control" id="description" rows="3"></textarea>
+    <textarea class="form-control" id="description" name="description" rows="3"></textarea>
   </div>
   <div class="form-group">
     <label for="input">Problem Input</label>
     <small id="inputHelp" class="form-text text-muted">Newline seperates inputs</small>
-    <textarea class="form-control" id="input" rows="3"></textarea>
+    <textarea class="form-control" id="input" name="input" rows="3"></textarea>
   </div>
 
   <div class="form-group">
     <label for="language">Language</label>
-    <select class="form-control" id="language">
+    <select class="form-control" id="language" name="language">
       <option>C</option>
       <option>C++</option>
     </select>
@@ -27,33 +27,30 @@
 
   <div class="form-group">
     <label for="timeOut">Timeout</label>
-    <input type="number" id="timeOut" min="0" data-bind="value:timeOut" />
+    <input type="number" id="timeOut" name="timeOut" min="0" data-bind="value:timeOut" />
   </div>
 
   <fieldset class="form-group">
-  <legend>Valgrind</legend>
-  <div class="form-check">
+    <legend>Valgrind</legend>
+    <div class="form-check">
+      <label class="form-check-label">
+        <input type="radio" class="form-check-input" name="ValgrindOption" id="ValgrindNo" value="False" checked>
+        No
+      </label>
+    </div>
+    <div class="form-check">
     <label class="form-check-label">
-      <input type="radio" class="form-check-input" name="ValgrindOption" id="ValgrindNo" value="No" checked>
-      Yes
-    </label>
-  </div>
-  <div class="form-check">
-  <label class="form-check-label">
-      <input type="radio" class="form-check-input" name="ValgrindOption" id="ValgrindYes" value="Yes">
-      No
-    </label>
-  </div>
-</fieldset>
+        <input type="radio" class="form-check-input" name="ValgrindOption" id="ValgrindYes" value="True">
+        Yes
+      </label>
+    </div>
+  </fieldset>
 
-  <div class="form-group">
-    <label for="file">File input</label>
-    <input type="file" class="form-control-file" id="file" aria-describedby="fileHelp">
-    <small id="fileHelp" class="form-text text-muted">Upload the correct solution</small>
-  </div>
+  <label for="file">File input</label>
+  <input type="file" id="file" name="file"><br/>
 
 
-  <button type="submit" class="btn btn-primary">Submit</button>
+  <button type="submit" class="btn btn-primary" value="Upload">Submit</button>
 </form>
 
 {% endblock %}

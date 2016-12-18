@@ -1,7 +1,7 @@
 import os
-from flask import Flask, render_template, request, redirect, Markup
+from flask import Flask, render_template, request, redirect, Markup, url_for
 from werkzeug.utils import secure_filename
-from Domain import testFile, getDictKeysAndName, getNameAndDescription
+from Domain import testFile, getDictKeysAndName, getNameAndDescription, createProblem
 
 UPLOAD_FOLDER = os.path.dirname(os.path.abspath(__file__))
 ALLOWED_EXTENSIONS = set(['cpp', 'c'])          # haegt ad setja fleiri endingar
@@ -23,6 +23,35 @@ def index():
 @app.route("/createProblem")
 def createProblem():
     return render_template('createProblem.html')
+
+@app.route("/createProblem", methods=['POST'])
+def createProblemPost():
+    name = request.form['problemName']
+    description = request.form['description']
+    input = request.form['input']
+    language = request.form['language']             # tharf ad utfaera eitthvad fyrir language
+    timeOut = request.form['timeOut']               # haegt ad tjekka lika a endingu a faelnum
+    valgrind = request.form['ValgrindOption']
+    file = request.files['file']
+
+    target = os.path.join(app.config['UPLOAD_FOLDER'], 'uploads')
+    if not os.path.isdir(target):
+        os.mkdir(target)
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        destination = "/".join([target, filename])
+        file.save(destination)
+
+    testCases = []
+    for i in input.splitlines():
+        testCases.append(i)
+
+    # createProblem(problemName, problemDescription, inputFile, testCases, valgrind = False, timeout = 10):
+    # createProblem(name, description, destination, testCases, valgrind, timeOut)
+
+
+    return redirect(url_for('index'))
 
 @app.route("/handin/<pid>")
 def handin(pid):
