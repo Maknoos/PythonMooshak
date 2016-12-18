@@ -117,7 +117,6 @@ def addProblem(problemName, problemDescription, inputFile, testCases, language, 
     removeFile(inputFile)
     saveToFile()
 
-
 def initProblemDicts(dict):
     dict['Name'] = {}
     dict['Description'] = {}
@@ -210,6 +209,7 @@ def compile(inputFile,language):
 
 
 def maggi():
+    addProblem("dummy","dummy","dummy","dummy","dummy",False,"15")
     pass
     #init()
     #print(testFile("0","./correctIsPalindrome.cpp"))
