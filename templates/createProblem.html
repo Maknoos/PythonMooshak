@@ -9,6 +9,8 @@
 </div>
 {% endif %}
 
+<div class="well">Upload a file with the correct solution and we will generate the correct output based on your input.</div>
+
 <form action="{{ url_for('createProblemPost') }}" method="post" enctype="multipart/form-data">
   <div class="form-group">
     <label for="problemName">Problem name</label>
@@ -18,9 +20,11 @@
     <label for="description">Problem Description</label>
     <textarea class="form-control" id="description" name="description" placeholder="Enter description" rows="3" required></textarea>
   </div>
+
+
   <div class="form-group">
     <label for="input">Problem Input</label>
-    <small id="inputHelp" class="form-text text-muted">Newline seperates inputs</small>
+    <small id="inputHelp" class="form-text text-muted">Newline seperates inputs. If the input should be left empty please enter one new line character.</small>
     <textarea class="form-control" id="input" name="input" placeholder="Enter Input" rows="3" required></textarea>
   </div>
 
@@ -29,6 +33,7 @@
     <select class="form-control" id="language" name="language">
       <option value=".c">C</option>
       <option value=".cpp">C++</option>
+      <option value=".py">Python</option>
     </select>
   </div>
 
@@ -38,7 +43,7 @@
   </div>
 
   <fieldset class="form-group">
-    <legend>Do you want to run Valgrind on submitted solutions</legend>
+    <legend>Do you want to run Valgrind on submitted solutions to check for memory leaks?</legend>
     <div class="form-check">
       <label class="form-check-label">
         <input type="radio" class="form-check-input" name="ValgrindOption" id="ValgrindNo" value="False" checked>

@@ -1,8 +1,11 @@
 {% extends "layout.html" %}
 {% block body %}
 
-<h1>{{result['Name']}}</h1>
-<p>{{result['Description']}}</p>
+<div class="form-group">
+    <h1>{{result['Name']}}</h1>
+    <p>{{result['Description']}}</p>
+    <p>Allowed file endings: {{result['Language']}}</p>
+</div>
 <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
     <div>
         <input type="hidden" name="pid" value="{{pid}}">
