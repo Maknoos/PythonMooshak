@@ -6,6 +6,7 @@ import difflib
 import json
 from subprocess import TimeoutExpired # for some reason this isn't included when importing subprocess
 
+
 class compileTimeException(Exception):
     pass
 
@@ -34,7 +35,10 @@ def runCPlus(pairs,inputFile,timeLimit):
 #input is list of strings to test
 def generateAnswers(inputFile, input,language):
     answers = []
-    compile(inputFile,language)
+    #compileCPlus(inputFile)
+    compile(inputFile,getFileLanguage(inputFile))
+    #compile(inputFile,language)
+
     runString = inputFileToExe(inputFile)
     for inp in input:
         compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
@@ -48,11 +52,19 @@ def generateAnswers(inputFile, input,language):
     return answers
 
 def removeFile(inputFile):
-    os.remove(inputFileToExe(inputFile))
+    if inputFile.endswith('.py'):
+        os.remove(inputFile)
+        return
+    else:
+        os.remove(inputFileToExe(inputFile))
+def getFileLanguage(inputFile):
+    return re.search('\.[^.]*$',inputFile).group()
 
 def inputFileToExe(inputFile):
     if ".cpp" in inputFile: #hvað ef hún heitir asshole.cpp.c?
         return re.sub(".cpp$",".exe",inputFile)
+    elif inputFile.endswith(".py"): #py scripts dont run as exe
+        return ["python", inputFile]
     else:
         return re.sub(".c$", ".exe", inputFile)
     #ATH skrifa sem snyrtilegri lausn
@@ -139,9 +151,10 @@ def getDictKeysAndName():
     return [(x , answerDict[x]['Name']) for x in answerDict] #needs to be sorted by keys..
 
 def initTestData():
-    addProblem("Is Palindrome", "..", "./correctIsPalindrome.cpp", ['tacocat', 'not','aaaaa'])
-    addProblem("Pogba Goal", "..", "./correctPogba.cpp", ['x', 'k'])
-    addProblem("Only Digits", "..", "./correctOnlyDigits.cpp", ['18534', 'asdfd', '1?#3'])
+    addProblem("Is Palindrome", "..", "./correctIsPalindrome.cpp", ['tacocat', 'not','aaaaa'],'.cpp')
+    addProblem("Pogba Goal", "..", "./correctPogba.cpp", ['x', 'k'],'.cpp')
+    addProblem("Only Digits", "..", "./correctOnlyDigits.cpp", ['18534', 'asdfd', '1?#3'],'.cpp')
+    addProblem("testPython", "..", "./testPY.py", ['', '',''],'.py')
 
 def init():
     global answerDict
@@ -150,30 +163,45 @@ def init():
 def saveToFile():
     with open('AnswerDictionary.json', 'w') as f:
         json.dump(answerDict, f)
+def testRunPY(path):
+    #output = compilationProcess.communicate(input=inp.encode(), timeout=5)[0].decode()
+
+    compilationProcess = subprocess.Popen(["python", path], stdout=subprocess.PIPE, stdin=subprocess.PIPE,stderr=subprocess.PIPE)
+    status = compilationProcess.communicate()
+    output = status[0].decode()
+    error = status[1].decode()
+    if error != "":
+        raise compileTimeException(error)
+   # output = status[0].decode()
+    print(output)
+    #print(out)
+
 def KG():
-
+    #print('fuck')
+    #testRunPY('testPY.py')
     #InputFile = "./leak.cpp"
-
+    InputFile = "testPy.py"
     #InputFile = "./test.cpp"
 
     #InputFile = "./forever.cpp"
     #InputFile = "./wrongIsPalindrome.cpp"
-    InputFile = "./correctIsPalindrome.cpp"
+    #InputFile = "./correctIsPalindrome.cpp"
 
     #create problem
     #initTestData()
 
+
     init()
-    print("hi")
+    #print("hi")
 
     # test problem with id
-    problemID = getDictKeysAndName()[0][0]  # hardcoded to test
+    #problemID = getDictKeysAndName()[3][0]  # hardcoded to test
     print(answerDict)
-
-
-    compileCPlus(InputFile)
-    print (testFile('0', InputFile)[0])
-    exitAndSave()
+    problemID = '3'
+    print (testFile(problemID, InputFile))
+    #compileCPlus(InputFile)
+    #print (testFile('0', InputFile)[0])
+    saveToFile()
     #print (valgrindCheck(InputFile))
     #runCPlus(answerDict[problemID]['Answers'], InputFile)
     #removeFile(InputFile)
@@ -200,6 +228,8 @@ def compile(inputFile,language):
     exeFile = inputFileToExe(inputFile)
     if language == ".cpp":
         compiler = r"/usr/bin/g++"
+    elif language == ".py": #doesnt need compiling, although what about build errors?
+        return
     else:
         compiler = r"/usr/bin/gcc"
     compilationProcess = subprocess.Popen([compiler, inputFile, "-o", exeFile], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
@@ -216,4 +246,4 @@ def maggi():
 #maggi()
 
 
-#KG()
+KG()
