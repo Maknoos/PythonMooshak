@@ -82,7 +82,7 @@ def compare(obtained,expected):
         return difference
 
 def testFile(problemID, inputFile):
-    init()
+    updateData()
     result = ""
     feedBack = []
     answers = answerDict[problemID]['Answers']
@@ -135,17 +135,18 @@ def initProblemDicts(dict):
     dict['Valgrind'] = {}
     dict['Language'] = {}
 
-def getNameAndDescription(ID):
-    init()
+def getNameDescAndLang(ID):
+    updateData()
     data = {}
     data.setdefault('Name',answerDict[ID]['Name'])
     data.setdefault('Description',answerDict[ID]['Description'])
+    data.setdefault('Language',answerDict[ID]['Language'])
     return data
 
 #print(platform.system())
 #returns tuple of keys and name of problem
 def getDictKeysAndName():
-    init()
+    updateData()
     return [(x , answerDict[x]['Name']) for x in answerDict] #needs to be sorted by keys..
 
 def initTestData():
@@ -154,7 +155,7 @@ def initTestData():
     addProblem("Only Digits", "..", "./correctOnlyDigits.cpp", ['18534', 'asdfd', '1?#3'],'.cpp')
     addProblem("testPython", "..", "./testPY.py", ['', '',''],'.py')
 
-def init():
+def updateData():
     global answerDict
     with open('AnswerDictionary.json', 'r') as f:
         answerDict = json.load(f)
