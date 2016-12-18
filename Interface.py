@@ -1,11 +1,10 @@
 import os
 from flask import Flask, render_template, request, redirect, Markup, url_for
 from werkzeug.utils import secure_filename
-from Domain import testFile, getDictKeysAndName, getNameAndDescription, addProblem
-import json
+from Domain import testFile, getDictKeysAndName, getNameDescAndLang, addProblem
 
 UPLOAD_FOLDER = os.path.dirname(os.path.abspath(__file__))
-ALLOWED_EXTENSIONS = set(['cpp', 'c', 'py'])          # haegt ad setja fleiri endingar
+ALLOWED_EXTENSIONS = set(['cpp', 'c', 'py'])
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -38,7 +37,6 @@ def createProblemPost():
         valgrind = True
 
     errors = ''
-
     if not name or not description or 'file' not in request.files:
         errors = "Please enter all the fields."
 
@@ -57,6 +55,8 @@ def createProblemPost():
         filename = secure_filename(file.filename)
         destination = "/".join([target, filename])
         file.save(destination)
+    else:
+        return render_template("createProblem.html", errors="This file does not have the ending specified.")
 
     testCases = []
     for i in input.splitlines():
@@ -68,7 +68,7 @@ def createProblemPost():
 
 @app.route("/handin/<pid>")
 def handin(pid):
-    result = getNameAndDescription(pid)
+    result = getNameDescAndLang(pid)
     return render_template('handin.html', pid=pid, result=result)
 
 @app.route('/upload', methods=['POST'])
@@ -81,7 +81,7 @@ def upload():
 
     # check if the post request has the file part
     if 'file' not in request.files:
-        return redirect(request.url)       # redirecta aftur á upphafsidu?
+        return redirect(request.url)
 
     file = request.files['file']
 
@@ -89,12 +89,13 @@ def upload():
     # submit a empty part without filename
     if file.filename == '':
         return redirect(request.url)
+
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         destination = "/".join([target, filename])
         file.save(destination)
 
-        # senda a domain og fa nidurstodur tilbaka
+        # Get the result
         ans, testC = testFile(pid, destination)
 
         if ans == 'Accepted':
@@ -113,6 +114,8 @@ def upload():
             testC = Markup(testC)
 
         return render_template("answer.html", answer = ans, testCases = testC)
+
+    return redirect(url_for('index'))
 
 if __name__ == "__main__":
     app.run()
