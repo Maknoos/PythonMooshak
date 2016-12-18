@@ -111,7 +111,7 @@ def addProblem(problemName, problemDescription, inputFile, testCases, language, 
     answerDict[ID]['Name'] = problemName
     answerDict[ID]['Description'] = problemDescription
     answerDict[ID]['Answers'] = generateAnswers(inputFile,testCases,language)
-    answerDict[ID]['Timeout'] = timeout
+    answerDict[ID]['Timeout'] = int(timeout)
     answerDict[ID]['Valgrind'] = valgrind
     answerDict[ID]['Language'] = language
     removeFile(inputFile)
