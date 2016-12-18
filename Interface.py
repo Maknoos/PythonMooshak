@@ -36,12 +36,9 @@ def createProblemPost():
     else:
         valgrind = True
 
-    errors = ''
+    # redirect to createProblem page if input forms are not valid
     if not name or not description or 'file' not in request.files:
-        errors = "Please enter all the fields."
-
-    if errors:
-        return render_template("createProblem.html", errors=errors)
+        return render_template("createProblem.html", errors="Please enter all the fields.")
 
     file = request.files['file']
     if file.filename == '':
