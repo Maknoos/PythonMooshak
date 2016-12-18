@@ -12,16 +12,18 @@
 </div>
 <!-- /.row -->
 
-{% for pid,name in problems %}
 <div class="row">
-    <div class="col-md-5">
+    {% for pid,name in problems %}
+  <div class="col-sm-6 col-md-4">
+    <div class="thumbnail">
+      <div class="caption">
         <h3>Problem {{loop.index}}</h3>
         <h4>{{name}}</h4>
         <a class="btn btn-primary" href="/handin/{{pid}}">View Problem<span class="glyphicon glyphicon-chevron-right"></span></a>
+      </div>
     </div>
+  </div>
+    {% endfor %}
 </div>
-{% endfor %}
-
-<hr>
 
 {% endblock %}

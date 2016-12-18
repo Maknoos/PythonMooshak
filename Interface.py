@@ -5,7 +5,7 @@ from Domain import testFile, getDictKeysAndName, getNameAndDescription, addProbl
 import json
 
 UPLOAD_FOLDER = os.path.dirname(os.path.abspath(__file__))
-ALLOWED_EXTENSIONS = set(['cpp', 'c'])          # haegt ad setja fleiri endingar
+ALLOWED_EXTENSIONS = set(['cpp', 'c', 'py'])          # haegt ad setja fleiri endingar
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -30,15 +30,24 @@ def createProblemPost():
     name = request.form['problemName']
     description = request.form['description']
     input = request.form['input']
-    language = request.form['language']             # tharf ad utfaera eitthvad fyrir language
-    timeOut = request.form['timeOut']               # haegt ad tjekka lika a endingu a faelnum
-
+    language = request.form['language']
+    timeOut = request.form['timeOut']
     if request.form['ValgrindOption'] == 'False':
         valgrind = False
     else:
         valgrind = True
 
+    errors = ''
+
+    if not name or not description or 'file' not in request.files:
+        errors = "Please enter all the fields."
+
+    if errors:
+        return render_template("createProblem.html", errors=errors)
+
     file = request.files['file']
+    if file.filename == '':
+        return render_template("createProblem.html", errors="Please choose a file.")
 
     target = os.path.join(app.config['UPLOAD_FOLDER'], 'uploads')
     if not os.path.isdir(target):
@@ -62,20 +71,19 @@ def handin(pid):
     result = getNameAndDescription(pid)
     return render_template('handin.html', pid=pid, result=result)
 
-# athuga med villumedhondlun
 @app.route('/upload', methods=['POST'])
 def upload():
     target = os.path.join(app.config['UPLOAD_FOLDER'], 'uploads')
+    pid = request.form['pid']
 
     if not os.path.isdir(target):
         os.mkdir(target)
 
     # check if the post request has the file part
     if 'file' not in request.files:
-        return redirect(request.url)        # redirecta aftur á upphafsidu?
+        return redirect(request.url)       # redirecta aftur á upphafsidu?
 
     file = request.files['file']
-    pid = request.form['pid']               # senda með
 
     # if user does not select file, browser also
     # submit a empty part without filename
