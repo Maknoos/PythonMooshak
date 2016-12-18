@@ -1,5 +1,4 @@
 import subprocess
-import platform
 import re
 import os
 import difflib
@@ -54,12 +53,15 @@ def getFileLanguage(inputFile):
     return re.search('\.[^.]*$',inputFile).group()
 
 def inputFileToExe(inputFile):
-    if ".cpp" in inputFile: #hvað ef hún heitir asshole.cpp.c?
+    if inputFile.endswith(".cpp"):
         return re.sub(".cpp$",".exe",inputFile)
     elif inputFile.endswith(".py"): #py scripts dont run as exe
         return ["python3", inputFile]
-    else:
+    elif inputFile.endswith(".c"):
         return re.sub(".c$", ".exe", inputFile)
+    else:
+        #error?
+        return None
     #ATH skrifa sem snyrtilegri lausn
 
 #takes in the output from the compiled program and compares it to a file with correct output
