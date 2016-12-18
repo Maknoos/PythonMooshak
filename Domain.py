@@ -3,7 +3,7 @@ import re
 import os
 import difflib
 import json
-from subprocess import TimeoutExpired # for some reason this isn't included when importing subprocess
+from subprocess import TimeoutExpired  # for some reason this isn't included when importing subprocess
 
 
 class compileTimeException(Exception):
@@ -12,19 +12,17 @@ class compileTimeException(Exception):
 answerDict = {}
 
 def runInputFile(pairs, inputFile, timeLimit):
-    #runString = "./" + inputFileToExe(inpuls
-    # tFile)
     differences = []
     runString = inputFileToExe(inputFile)
     for pair in pairs:
-        compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE,stdin=subprocess.PIPE)
+        compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
         currInput = pair[0].encode()
         try:
-            output = compilationProcess.communicate(input=currInput,timeout=timeLimit)[0].decode()
+            output = compilationProcess.communicate(input=currInput, timeout=timeLimit)[0].decode()
         except TimeoutExpired:
             compilationProcess.kill()
             raise
-        result = compare(output,pair[1])
+        result = compare(output, pair[1])
 
         if result != "":
             differences.append(result)
@@ -60,9 +58,7 @@ def inputFileToExe(inputFile):
     elif inputFile.endswith(".c"):
         return re.sub(".c$", ".exe", inputFile)
     else:
-        #error?
         return None
-    #ATH skrifa sem snyrtilegri lausn
 
 #takes in the output from the compiled program and compares it to a file with correct output
 def compare(obtained,expected):
@@ -71,13 +67,7 @@ def compare(obtained,expected):
         return ""
     else:
         print ("Test case failed!")
-        #HTML TABLE if we want
-
         difference = difflib.HtmlDiff().make_table(obtained.splitlines(), expected.splitlines())
-        #difference = difflib.HtmlDiff().make_file(obtained.splitlines(), expected.splitlines())
-
-        #difference = '\n'.join(difflib.Differ().compare(obtained.splitlines(), expected.splitlines()))
-        #print(difference)
         return difference
 
 def testFile(problemID, inputFile):
@@ -97,11 +87,11 @@ def testFile(problemID, inputFile):
     except TimeoutExpired:
         return errorHandle(("Time limit exceeded",[]), inputFile)
 
-    if len(feedBack)!=0: #gera hjalparfall
+    if len(feedBack)!=0:
         result = "Wrong Answer"
     elif checkMemory:
         feedBack = valgrindCheck(inputFile)
-        if len(feedBack) != 0:  #gera hjalparfall
+        if len(feedBack) != 0:
             result = "Memory error"
     else:
         result = "Accepted"
@@ -147,12 +137,6 @@ def getDictKeysAndName():
     updateData()
     return [(x , answerDict[x]['Name']) for x in answerDict]
 
-def initTestData():
-    addProblem("Is Palindrome", "..", "./correctIsPalindrome.cpp", ['tacocat', 'not','aaaaa'],'.cpp')
-    addProblem("Pogba Goal", "..", "./correctPogba.cpp", ['x', 'k'],'.cpp')
-    addProblem("Only Digits", "..", "./correctOnlyDigits.cpp", ['18534', 'asdfd', '1?#3'],'.cpp')
-    addProblem("testPython", "..", "./testPY.py", ['', '',''],'.py')
-
 def updateData():
     global answerDict
     with open('AnswerDictionary.json', 'r') as f:
@@ -192,14 +176,4 @@ def compile(inputFile,language):
     if error != "":
         raise compileTimeException(error)
 
-
-def maggi():
-    addProblem("dummy","dummy","dummy","dummy","dummy",False,"15")
-    pass
-    #init()
-    #print(testFile("0","./correctIsPalindrome.cpp"))
-#maggi()
-
-
-#KG()
 
