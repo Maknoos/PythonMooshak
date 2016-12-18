@@ -25,7 +25,7 @@
   <div class="form-group">
     <label for="input">Problem Input</label>
     <small id="inputHelp" class="form-text text-muted">Newline seperates inputs. If the input should be left empty please enter one new line character.</small>
-    <textarea class="form-control" id="input" name="input" placeholder="Enter Input" rows="3" required></textarea>
+    <textarea class="form-control" id="input" name="input" placeholder="Enter Input" rows="3"></textarea>
   </div>
 
   <div class="form-group">
@@ -38,7 +38,7 @@
   </div>
 
   <div class="form-group">
-    <label for="timeOut">Timeout</label>
+    <label for="timeOut">Time limit</label>
     <input type="number" id="timeOut" name="timeOut" min="0" data-bind="value:timeOut" required/>
   </div>
 
@@ -59,7 +59,7 @@
   </fieldset>
 
   <label for="file">File input</label>
-  <input type="file" id="file" name="file"><br/>
+  <input type="file" id="file" name="file" required><br/>
 
 
   <button type="submit" class="btn btn-primary" value="Upload">Submit</button>
