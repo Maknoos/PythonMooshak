@@ -67,17 +67,9 @@ def inputFileToExe(inputFile):
 #takes in the output from the compiled program and compares it to a file with correct output
 def compare(obtained,expected):
     if(obtained == expected):
-        print ("Test case passed!")
         return ""
     else:
-        print ("Test case failed!")
-        #HTML TABLE if we want
-
         difference = difflib.HtmlDiff().make_table(obtained.splitlines(), expected.splitlines())
-        #difference = difflib.HtmlDiff().make_file(obtained.splitlines(), expected.splitlines())
-
-        #difference = '\n'.join(difflib.Differ().compare(obtained.splitlines(), expected.splitlines()))
-        #print(difference)
         return difference
 
 def testFile(problemID, inputFile):
@@ -107,6 +99,7 @@ def testFile(problemID, inputFile):
         result = "Accepted"
     removeFile(inputFile)
     return result, feedBack
+
 def errorHandle(tuple, file):
     removeFile(file)
     return tuple
