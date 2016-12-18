@@ -9,6 +9,7 @@ from subprocess import TimeoutExpired  # for some reason this isn't included whe
 class compileTimeException(Exception):
     pass
 
+#Main data structure used to store problems on runtime
 answerDict = {}
 
 def runInputFile(pairs, inputFile, timeLimit):
@@ -29,7 +30,9 @@ def runInputFile(pairs, inputFile, timeLimit):
 
     return differences
 
-#input is list of strings to test
+#We take in the 'Answer' file and the inputs to run tests with
+#we compile and run the answer file with the inputs and generate tuples of
+#input to output pairings which we later use to compare
 def generateAnswers(inputFile, input,language):
     answers = []
     compile(inputFile,getFileLanguage(inputFile))
@@ -41,15 +44,21 @@ def generateAnswers(inputFile, input,language):
         answers.append((inp, output))
     return answers
 
+#Clean up function that removes files we are done with(.exe mostly)
+#Python files are also removed but this is arguable
 def removeFile(inputFile):
     if inputFile.endswith('.py'):
         os.remove(inputFile)
         return
     else:
         os.remove(inputFileToExe(inputFile))
+#Get which programming language a file is written in
 def getFileLanguage(inputFile):
     return re.search('\.[^.]*$', inputFile).group()
 
+
+#Simple function that changes the file extensions of .cpp and .c to .exe files
+#both for clean up purposes and also for simpler "run" code
 def inputFileToExe(inputFile):
     if inputFile.endswith(".cpp"):
         return re.sub(".cpp$", ".exe", inputFile)
@@ -61,10 +70,12 @@ def inputFileToExe(inputFile):
         return None
 
 #takes in the output from the compiled program and compares it to a file with correct output
+#returns a html table that we render that diplays the differences
 def compare(obtained, expected):
     if(obtained == expected):
         return ""
     else:
+        difference = difflib.HtmlDiff().make_table(obtained.splitlines(), expected.splitlines())
         return difference
 
 def testFile(problemID, inputFile):
@@ -95,10 +106,13 @@ def testFile(problemID, inputFile):
     removeFile(inputFile)
     return result, feedBack
 
+#Simple wrapping function for removing a file when we hit an exception to avoid repeated code
 def errorHandle(tuple, file):
     removeFile(file)
     return tuple
-
+#This function creates a "problem". The file from the user is compiled & run with the given test cases and
+#the results  are stored with the input as tuples. after running the .exe file is deleted. User can choose
+#whether they want valgrind to be used or even how long for timeout.
 def addProblem(problemName, problemDescription, inputFile, testCases, language, valgrind = False, timeout = 10):
 
     ID = len(answerDict.keys())
@@ -114,6 +128,7 @@ def addProblem(problemName, problemDescription, inputFile, testCases, language, 
     removeFile(inputFile)
     saveToFile()
 
+#Initialize the dictionary with more dictionaries
 def initProblemDicts(dict):
     dict['Name'] = {}
     dict['Description'] = {}
@@ -135,10 +150,12 @@ def getDictKeysAndName():
     updateData()
     return [(x, answerDict[x]['Name']) for x in answerDict]
 
+#Fill dictionary with data(problems) from the .json file
 def updateData():
     global answerDict
     with open('AnswerDictionary.json', 'r') as f:
         answerDict = json.load(f)
+#Saves the dictionary into a .json file
 def saveToFile():
     with open('AnswerDictionary.json', 'w') as f:
         json.dump(answerDict, f)
