@@ -166,6 +166,8 @@ def saveToFile():
 def valgrindCheck(inputFile):
     #ATH ./
     inputFile = inputFileToExe(inputFile)
+    if ".py" in inputFile:
+        return ""
     memoryProcess = subprocess.Popen(["valgrind","--leak-check=yes",inputFile],stdin=subprocess.PIPE,stderr=subprocess.PIPE)
     output = memoryProcess.communicate()[1].decode()
 
