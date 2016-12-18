@@ -89,11 +89,11 @@ def testFile(problemID, inputFile):
     try:
        compile(inputFile,language)
     except compileTimeException as compileError:
-        return "Compile Time error" , [str(compileError)]
+        return errorHandle(("Compile Time error" , [str(compileError)]),inputFile)
     try:
         feedBack = runInputFile(answers, inputFile, timeout)
     except TimeoutExpired:
-        return(("Time limit exceeded",[]), inputFile)
+        return errorHandle(("Time limit exceeded",[]), inputFile)
 
     if len(feedBack)!=0: #gera hjalparfall
         result = "Wrong Answer"
@@ -108,7 +108,7 @@ def testFile(problemID, inputFile):
 def errorHandle(tuple, file):
     removeFile(file)
     return tuple
-#we dont save the inputFile for now.. just answers and id of the problem
+
 def addProblem(problemName, problemDescription, inputFile, testCases, language, valgrind = False, timeout = 10):
 
     ID = len(answerDict.keys())
@@ -143,7 +143,7 @@ def getNameDescAndLang(ID):
 #returns tuple of keys and name of problem
 def getDictKeysAndName():
     updateData()
-    return [(x , answerDict[x]['Name']) for x in answerDict] #needs to be sorted by keys..
+    return [(x , answerDict[x]['Name']) for x in answerDict]
 
 def initTestData():
     addProblem("Is Palindrome", "..", "./correctIsPalindrome.cpp", ['tacocat', 'not','aaaaa'],'.cpp')
