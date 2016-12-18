@@ -6,6 +6,7 @@ import difflib
 import json
 from subprocess import TimeoutExpired #for some reason this isn't included when importing subprocess
 
+
 class compileTimeException(Exception):
     pass
 
@@ -42,7 +43,8 @@ def runCPlus(pairs,inputFile,timeLimit):
 #input is list of strings to test
 def generateAnswers(inputFile, input):
     answers = []
-    compileCPlus(inputFile)
+    #compileCPlus(inputFile)
+    compile(inputFile,getFileLanguage(inputFile))
     runString = inputFileToExe(inputFile)
     for inp in input:
         compilationProcess = subprocess.Popen(runString, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
@@ -56,11 +58,19 @@ def generateAnswers(inputFile, input):
     return answers
 
 def removeFile(inputFile):
-    os.remove(inputFileToExe(inputFile))
+    if inputFile.endswith('.py'):
+        os.remove(inputFile)
+        return
+    else:
+        os.remove(inputFileToExe(inputFile))
+def getFileLanguage(inputFile):
+    return re.search('\.[^.]*$',inputFile).group()
 
 def inputFileToExe(inputFile):
     if ".cpp" in inputFile: #hvað ef hún heitir asshole.cpp.c?
         return re.sub(".cpp$",".exe",inputFile)
+    elif inputFile.endswith(".py"): #py scripts dont run as exe
+        return ["python", inputFile]
     else:
         return re.sub(".c$", ".exe", inputFile)
     #ATH skrifa sem snyrtilegri lausn
@@ -123,8 +133,12 @@ def createProblem(problemName, problemDescription, inputFile, testCases, valgrin
     answerDict[ID]['Answers'] = generateAnswers(inputFile,testCases)
     answerDict[ID]['Timeout'] = timeout
     answerDict[ID]['Valgrind'] = valgrind
-    answerDict[ID]['Language'] = re.search('\.[^.]*$',inputFile).group()
-    removeFile(inputFile)
+    answerDict[ID]['Language'] = getFileLanguage(inputFile)
+    print(inputFile)
+    print(type(inputFile))
+    print(ID)
+    print(answerDict)
+    #removeFile(inputFile)
 
 
 def initProblemDicts(dict):
@@ -158,6 +172,9 @@ def initTestData():
     createProblem("Is Palindrome", "..", "./correctIsPalindrome.cpp", ['tacocat', 'not','aaaaa'])
     createProblem("Pogba Goal", "..", "./correctPogba.cpp", ['x', 'k'])
     createProblem("Only Digits", "..", "./correctOnlyDigits.cpp", ['18534', 'asdfd', '1?#3'])
+    createProblem("testPython", "..", "./testPY.py", ['', '',''])
+
+
 
 def init():
     global answerDict
@@ -166,29 +183,44 @@ def init():
 def exitAndSave():
     with open('AnswerDictionary.json', 'w') as f:
         json.dump(answerDict, f)
+def testRunPY(path):
+    #output = compilationProcess.communicate(input=inp.encode(), timeout=5)[0].decode()
+
+    compilationProcess = subprocess.Popen(["python", path], stdout=subprocess.PIPE, stdin=subprocess.PIPE,stderr=subprocess.PIPE)
+    status = compilationProcess.communicate()
+    output = status[0].decode()
+    error = status[1].decode()
+    if error != "":
+        raise compileTimeException(error)
+   # output = status[0].decode()
+    print(output)
+    #print(out)
+
 def KG():
-
+    #print('fuck')
+    #testRunPY('testPY.py')
     #InputFile = "./leak.cpp"
-
+    InputFile = "testPy.py"
     #InputFile = "./test.cpp"
 
     #InputFile = "./forever.cpp"
     #InputFile = "./wrongIsPalindrome.cpp"
-    InputFile = "./correctIsPalindrome.cpp"
+    #InputFile = "./correctIsPalindrome.cpp"
 
     #create problem
     #initTestData()
 
+
     init()
-    print("hi")
+    #print("hi")
 
     # test problem with id
-    problemID = getDictKeysAndName()[0][0]  # hardcoded to test
+    #problemID = getDictKeysAndName()[3][0]  # hardcoded to test
     print(answerDict)
-
-
-    compileCPlus(InputFile)
-    print (testFile('0', InputFile)[0])
+    problemID = '3'
+    print (testFile(problemID, InputFile))
+    #compileCPlus(InputFile)
+    #print (testFile('0', InputFile)[0])
     exitAndSave()
     #print (valgrindCheck(InputFile))
     #runCPlus(answerDict[problemID]['Answers'], InputFile)
@@ -233,6 +265,8 @@ def compile(inputFile,language):
     exeFile = inputFileToExe(inputFile)
     if language == ".cpp":
         compiler = r"/usr/bin/g++"
+    elif language == ".py": #doesnt need compiling, although what about build errors?
+        return
     else:
         compiler = r"/usr/bin/gcc"
     compilationProcess = subprocess.Popen([compiler, inputFile, "-o", exeFile], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
